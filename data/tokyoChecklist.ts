@@ -307,6 +307,19 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     }
   },
   {
+    id: "download-klook",
+    title: "Download Klook",
+    description:
+      "Book trains, airport transfers, attractions, and activities across Japan in one place.",
+    priority: "recommended",
+    timing: "before-flight",
+    category: "Apps to Download",
+    link: {
+      label: "Get Klook",
+      url: "https://www.klook.com/"
+    }
+  },
+  {
     id: "confirm-airport-terminal",
     title: "Confirm your arrival airport and terminal",
     description:
