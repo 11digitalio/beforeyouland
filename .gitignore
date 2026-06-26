@@ -1,0 +1,29 @@
+node_modules
+
+# Build output
+.next/
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local cache and output
+.cache/
+.turbo/
+coverage/
+outputs/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.node_repl_cell_*
+*.tsbuildinfo
+
+# Local utility scripts
+/scripts/
+
+# OS files
+.DS_Store

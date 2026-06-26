@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "data/**/*.ts",
+    "types/**/*.ts",
+    "next.config.ts",
+    "tailwind.config.ts",
+    "postcss.config.js"
+  ],
+  "exclude": ["node_modules", ".next"]
+}
