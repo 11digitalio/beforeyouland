@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowCounterClockwise, CaretDown, ShareFat, SquaresFour } from "@phosphor-icons/react/dist/ssr";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChecklistSection } from "@/components/ChecklistSection";
 import { FilterBar } from "@/components/FilterBar";
 import { IconTile } from "@/components/IconTile";
@@ -15,8 +15,11 @@ import type {
 } from "@/types/checklist";
 
 const STORAGE_KEY = "before-you-land:tokyo:completed-items";
+const ORDER_STORAGE_KEY = "before-you-land:tokyo:item-order:v1";
+const MILESTONES = [25, 50, 75, 100];
 
 type TimingFilter = ChecklistTiming | "all";
+type ItemOrder = Record<string, string[]>;
 
 export function ChecklistDashboard({
   categories,
@@ -26,21 +29,53 @@ export function ChecklistDashboard({
   items: ChecklistItem[];
 }) {
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [settlingIds, setSettlingIds] = useState<Set<string>>(new Set());
+  const [itemOrder, setItemOrder] = useState<ItemOrder>(() => createDefaultOrder(categories, items));
+  const [milestone, setMilestone] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [timingFilter, setTimingFilter] = useState<TimingFilter>("all");
   const [shareLink, setShareLink] = useState<string>("");
   const [shareStatus, setShareStatus] = useState<string>("");
+  const completedIdsRef = useRef<Set<string>>(new Set());
+  const itemOrderRef = useRef<ItemOrder>(itemOrder);
+  const settlingTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const milestoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     try {
       const saved = JSON.parse(window.localStorage?.getItem(STORAGE_KEY) || "[]");
       if (Array.isArray(saved)) {
-        setCompletedIds(new Set(saved.filter((id): id is string => typeof id === "string")));
+        const nextCompletedIds = new Set(
+          saved.filter((id): id is string => typeof id === "string")
+        );
+        completedIdsRef.current = nextCompletedIds;
+        setCompletedIds(nextCompletedIds);
       }
     } catch {
+      completedIdsRef.current = new Set();
       setCompletedIds(new Set());
     }
-  }, []);
+
+    try {
+      const savedOrder = JSON.parse(window.localStorage?.getItem(ORDER_STORAGE_KEY) || "{}");
+      const nextOrder = reconcileOrder(savedOrder, categories, items);
+      itemOrderRef.current = nextOrder;
+      setItemOrder(nextOrder);
+    } catch {
+      const nextOrder = createDefaultOrder(categories, items);
+      itemOrderRef.current = nextOrder;
+      setItemOrder(nextOrder);
+    }
+  }, [categories, items]);
+
+  useEffect(
+    () => () => {
+      settlingTimersRef.current.forEach((timer) => clearTimeout(timer));
+      if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
+    },
+    []
+  );
 
   const completedCount = useMemo(
     () => items.filter((item) => completedIds.has(item.id)).length,
@@ -61,17 +96,29 @@ export function ChecklistDashboard({
   const sections = useMemo(
     () =>
       categories
-        .map((category) => ({
-          category,
-          items: visibleItems.filter((item) => item.category === category.title)
-        }))
+        .map((category) => {
+          const orderIndex = new Map(
+            (itemOrder[category.title] || []).map((id, index) => [id, index])
+          );
+          return {
+            category,
+            items: visibleItems
+              .filter((item) => item.category === category.title)
+              .sort(
+                (a, b) =>
+                  (orderIndex.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+                  (orderIndex.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+              )
+          };
+        })
         .filter((section) => section.items.length > 0),
-    [categories, visibleItems]
+    [categories, itemOrder, visibleItems]
   );
 
   function toggleItem(id: string) {
-    const wasCompleted = completedIds.has(id);
-    const next = new Set(completedIds);
+    const current = completedIdsRef.current;
+    const wasCompleted = current.has(id);
+    const next = new Set(current);
 
     if (next.has(id)) {
       next.delete(id);
@@ -79,11 +126,43 @@ export function ChecklistDashboard({
       next.add(id);
     }
 
+    completedIdsRef.current = next;
     setCompletedIds(next);
-    try {
-      window.localStorage?.setItem(STORAGE_KEY, JSON.stringify(Array.from(next)));
-    } catch {
-      // Some embedded browser contexts block localStorage; keep the in-page state usable.
+    persistCompletedIds(next);
+
+    const existingTimer = settlingTimersRef.current.get(id);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      settlingTimersRef.current.delete(id);
+    }
+
+    if (wasCompleted || reducedMotion) {
+      setSettlingIds((currentIds) => {
+        if (!currentIds.has(id)) return currentIds;
+        const nextIds = new Set(currentIds);
+        nextIds.delete(id);
+        return nextIds;
+      });
+    } else {
+      setSettlingIds((currentIds) => new Set(currentIds).add(id));
+      const timer = setTimeout(() => {
+        setSettlingIds((currentIds) => {
+          const nextIds = new Set(currentIds);
+          nextIds.delete(id);
+          return nextIds;
+        });
+        settlingTimersRef.current.delete(id);
+      }, 500);
+      settlingTimersRef.current.set(id, timer);
+    }
+
+    if (!wasCompleted) {
+      const beforeProgress = items.length > 0 ? (countCompleted(items, current) / items.length) * 100 : 0;
+      const afterProgress = items.length > 0 ? (countCompleted(items, next) / items.length) * 100 : 0;
+      const crossedMilestone = MILESTONES.find(
+        (value) => beforeProgress < value && afterProgress >= value
+      );
+      if (crossedMilestone) showMilestone(crossedMilestone);
     }
 
     trackEvent(wasCompleted ? "checklist_item_uncompleted" : "checklist_item_completed", {
@@ -93,7 +172,13 @@ export function ChecklistDashboard({
   }
 
   function resetChecklist() {
+    settlingTimersRef.current.forEach((timer) => clearTimeout(timer));
+    settlingTimersRef.current.clear();
+    completedIdsRef.current = new Set();
     setCompletedIds(new Set());
+    setSettlingIds(new Set());
+    setMilestone(null);
+    if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
     try {
       window.localStorage?.removeItem(STORAGE_KEY);
     } catch {
@@ -101,6 +186,36 @@ export function ChecklistDashboard({
     }
     setShareLink("");
     setShareStatus("");
+  }
+
+  function showMilestone(value: number) {
+    if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
+    setMilestone(value);
+    milestoneTimerRef.current = setTimeout(() => {
+      setMilestone(null);
+      milestoneTimerRef.current = null;
+    }, 1400);
+  }
+
+  function reorderVisibleItems(category: string, visibleIncompleteIds: string[]) {
+    const current = itemOrderRef.current;
+    const fullCategoryOrder =
+      current[category] ||
+      items.filter((item) => item.category === category).map((item) => item.id);
+    const visibleIds = new Set(visibleIncompleteIds);
+    let visibleIndex = 0;
+    const nextCategoryOrder = fullCategoryOrder.map((id) =>
+      visibleIds.has(id) ? visibleIncompleteIds[visibleIndex++] : id
+    );
+    const nextOrder = { ...current, [category]: nextCategoryOrder };
+
+    itemOrderRef.current = nextOrder;
+    setItemOrder(nextOrder);
+    try {
+      window.localStorage?.setItem(ORDER_STORAGE_KEY, JSON.stringify(nextOrder));
+    } catch {
+      // Some embedded browser contexts block localStorage; keep the in-page order usable.
+    }
   }
 
   async function shareChecklist() {
@@ -225,11 +340,34 @@ export function ChecklistDashboard({
                   <p className="truncate text-sm font-black text-slate-600">
                     {completedCount} of {items.length} completed
                   </p>
-                  <p className="shrink-0 text-sm font-black text-pine">{progress}%</p>
+                  <p
+                    className={[
+                      "shrink-0 text-sm font-black text-pine",
+                      reducedMotion ? "" : "progress-number-change"
+                    ].join(" ")}
+                    key={progress}
+                  >
+                    {progress}%
+                  </p>
                 </div>
-                <ProgressBar value={progress} />
-                <p className="mt-1.5 text-[11px] font-semibold leading-4 text-slate-500">
-                  Progress saves automatically on this device.
+                <ProgressBar
+                  celebrating={milestone !== null}
+                  reducedMotion={reducedMotion}
+                  value={progress}
+                />
+                <p
+                  aria-live="polite"
+                  className={[
+                    "mt-1.5 text-[11px] font-semibold leading-4",
+                    milestone ? "text-pine" : "text-slate-500",
+                    milestone && !reducedMotion ? "milestone-message" : ""
+                  ].join(" ")}
+                >
+                  {milestone
+                    ? milestone === 100
+                      ? "Checklist complete."
+                      : `${milestone}% milestone reached.`
+                    : "Progress saves automatically on this device."}
                 </p>
               </div>
 
@@ -265,7 +403,10 @@ export function ChecklistDashboard({
                   completedIds={completedIds}
                   items={section.items}
                   key={section.category.id}
+                  onReorder={reorderVisibleItems}
                   onToggle={toggleItem}
+                  reducedMotion={reducedMotion}
+                  settlingIds={settlingIds}
                 />
               ))}
             </div>
@@ -343,4 +484,72 @@ function copyTextWithTextarea(text: string) {
   } finally {
     textarea.remove();
   }
+}
+
+function createDefaultOrder(
+  categories: ChecklistCategoryDefinition[],
+  items: ChecklistItem[]
+): ItemOrder {
+  return Object.fromEntries(
+    categories.map((category) => [
+      category.title,
+      items.filter((item) => item.category === category.title).map((item) => item.id)
+    ])
+  );
+}
+
+function reconcileOrder(
+  savedOrder: unknown,
+  categories: ChecklistCategoryDefinition[],
+  items: ChecklistItem[]
+): ItemOrder {
+  const defaults = createDefaultOrder(categories, items);
+  if (!savedOrder || typeof savedOrder !== "object" || Array.isArray(savedOrder)) {
+    return defaults;
+  }
+
+  const savedRecord = savedOrder as Record<string, unknown>;
+  return Object.fromEntries(
+    categories.map((category) => {
+      const defaultIds = defaults[category.title];
+      const validIds = new Set(defaultIds);
+      const savedIds = Array.isArray(savedRecord[category.title])
+        ? (savedRecord[category.title] as unknown[]).filter(
+            (id): id is string => typeof id === "string" && validIds.has(id)
+          )
+        : [];
+      const uniqueSavedIds = Array.from(new Set(savedIds));
+      const knownIds = new Set(uniqueSavedIds);
+      return [
+        category.title,
+        [...uniqueSavedIds, ...defaultIds.filter((id) => !knownIds.has(id))]
+      ];
+    })
+  );
+}
+
+function persistCompletedIds(completedIds: Set<string>) {
+  try {
+    window.localStorage?.setItem(STORAGE_KEY, JSON.stringify(Array.from(completedIds)));
+  } catch {
+    // Some embedded browser contexts block localStorage; keep the in-page state usable.
+  }
+}
+
+function countCompleted(items: ChecklistItem[], completedIds: Set<string>) {
+  return items.filter((item) => completedIds.has(item.id)).length;
+}
+
+function usePrefersReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener("change", updatePreference);
+    return () => mediaQuery.removeEventListener("change", updatePreference);
+  }, []);
+
+  return reducedMotion;
 }

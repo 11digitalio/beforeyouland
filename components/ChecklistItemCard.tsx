@@ -1,48 +1,126 @@
 "use client";
 
-import { ArrowSquareOut, CaretDown, CaretUp, Check } from "@phosphor-icons/react/dist/ssr";
-import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import {
+  ArrowSquareOut,
+  CaretDown,
+  CaretUp,
+  Check,
+  DotsSixVertical
+} from "@phosphor-icons/react/dist/ssr";
+import { useEffect, useState } from "react";
 import { Badge, priorityLabels, timingLabels } from "@/components/Badge";
 import type { ChecklistItem } from "@/types/checklist";
 
 export function ChecklistItemCard({
   item,
   completed,
+  settling,
+  reducedMotion,
   onToggle
 }: {
   item: ChecklistItem;
   completed: boolean;
+  settling: boolean;
+  reducedMotion: boolean;
   onToggle: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = () => setExpanded((current) => !current);
+  const compactCompleted = completed && !settling;
+  const {
+    attributes,
+    isDragging,
+    listeners,
+    setActivatorNodeRef,
+    setNodeRef,
+    transform,
+    transition
+  } = useSortable({
+    id: item.id,
+    disabled: completed,
+    animateLayoutChanges: () => !reducedMotion
+  });
+  const sortableStyle = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`
+      : undefined,
+    transition: reducedMotion ? undefined : transition
+  };
+
+  useEffect(() => {
+    if (completed) setExpanded(false);
+  }, [completed]);
+
+  if (compactCompleted) {
+    return (
+      <article
+        className={[
+          "print-card rounded-[1.15rem] bg-paper opacity-60 shadow-card",
+          reducedMotion ? "" : "transition-[transform,opacity,box-shadow] duration-300 ease-out",
+          isDragging ? "relative z-30 shadow-soft" : ""
+        ].join(" ")}
+        ref={setNodeRef}
+        style={sortableStyle}
+      >
+        <button
+          aria-label={`Mark ${item.title} incomplete`}
+          className="flex min-h-12 w-full items-center gap-2.5 rounded-[1.15rem] px-3 py-2 text-left transition hover:bg-greenSoft/50 active:bg-greenSoft"
+          onClick={() => onToggle(item.id)}
+          type="button"
+        >
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-xl bg-pine text-white shadow-tile">
+            <Check aria-hidden="true" size={16} weight="bold" />
+          </span>
+          <span className="min-w-0 flex-1 text-sm font-black leading-5 text-slate-500 line-through decoration-slate-400 decoration-2">
+            {item.title}
+          </span>
+        </button>
+      </article>
+    );
+  }
 
   return (
     <article
       className={[
-        "print-card cursor-pointer rounded-[1.35rem] bg-paper p-3 shadow-card transition-all duration-300 ease-out sm:p-3.5",
-        completed ? "complete-settle opacity-60" : "hover:-translate-y-0.5 hover:shadow-soft"
+        "print-card cursor-pointer rounded-[1.35rem] bg-paper p-3 shadow-card sm:p-3.5",
+        reducedMotion ? "" : "transition-[transform,opacity,box-shadow,background-color] duration-300 ease-out",
+        settling ? "completion-success" : "hover:-translate-y-0.5 hover:shadow-soft",
+        isDragging ? "relative z-30 cursor-grabbing opacity-95 shadow-soft" : ""
       ].join(" ")}
       onClick={toggleExpanded}
+      ref={setNodeRef}
+      style={sortableStyle}
     >
       <div className="flex gap-2.5">
-        <button
-          aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
-          className={[
-            "no-print",
-            "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-2xl border-2 transition active:scale-95",
-            completed
-              ? "border-pine bg-pine text-white shadow-tile"
-              : "border-black/10 bg-linen/80 text-transparent hover:border-pine/35 hover:bg-greenSoft focus-visible:text-pine"
-          ].join(" ")}
-          onClick={(event) => {
-            event.stopPropagation();
-            onToggle(item.id);
-          }}
-          type="button"
-        >
-          {completed ? <Check aria-hidden="true" size={18} weight="bold" /> : <Check aria-hidden="true" size={14} weight="bold" />}
-        </button>
+        <div className="relative mt-0.5 size-8 shrink-0">
+          <button
+            aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
+            className={[
+              "check-control no-print flex size-8 items-center justify-center rounded-2xl border-2 active:scale-95",
+              reducedMotion ? "" : "transition-[transform,background-color,border-color,color] duration-200",
+              completed
+                ? "is-checked border-pine bg-pine text-white shadow-tile"
+                : "border-black/10 bg-linen/80 text-transparent hover:border-pine/35 hover:bg-greenSoft focus-visible:text-pine"
+            ].join(" ")}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggle(item.id);
+            }}
+            type="button"
+          >
+            <span className={completed ? "checkmark-reveal" : ""}>
+              <Check aria-hidden="true" size={completed ? 18 : 14} weight="bold" />
+            </span>
+          </button>
+          {settling ? (
+            <span aria-hidden="true" className="completion-particles">
+              {Array.from({ length: 6 }, (_, index) => (
+                <span key={index} />
+              ))}
+            </span>
+          ) : null}
+        </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-2">
@@ -54,6 +132,20 @@ export function ChecklistItemCard({
             >
               {item.title}
             </h3>
+
+            {!completed ? (
+              <button
+                {...attributes}
+                {...listeners}
+                aria-label={`Reorder ${item.title}`}
+                className="no-print -mt-1 inline-flex size-8 shrink-0 touch-manipulation cursor-grab items-center justify-center rounded-2xl bg-linen text-slate-500 transition hover:bg-blueSoft hover:text-blueInk active:cursor-grabbing active:scale-95"
+                onClick={(event) => event.stopPropagation()}
+                ref={setActivatorNodeRef}
+                type="button"
+              >
+                <DotsSixVertical aria-hidden="true" size={18} weight="bold" />
+              </button>
+            ) : null}
 
             <button
               aria-expanded={expanded}
