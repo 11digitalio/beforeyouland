@@ -15,19 +15,23 @@ import type { ChecklistItem } from "@/types/checklist";
 export function ChecklistItemCard({
   item,
   completed,
-  settling,
+  collapsing,
+  draggingActive,
   reducedMotion,
+  onCollapseComplete,
   onToggle
 }: {
   item: ChecklistItem;
   completed: boolean;
-  settling: boolean;
+  collapsing: boolean;
+  draggingActive: boolean;
   reducedMotion: boolean;
+  onCollapseComplete: (id: string) => void;
   onToggle: (id: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = () => setExpanded((current) => !current);
-  const compactCompleted = completed && !settling;
+  const compactCompleted = completed && !collapsing;
   const {
     attributes,
     isDragging,
@@ -45,7 +49,8 @@ export function ChecklistItemCard({
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`
       : undefined,
-    transition: reducedMotion ? undefined : transition
+    transition: reducedMotion || isDragging ? undefined : transition,
+    willChange: isDragging ? "transform" : undefined
   };
 
   useEffect(() => {
@@ -58,7 +63,7 @@ export function ChecklistItemCard({
         className={[
           "print-card rounded-[1.15rem] bg-paper opacity-60 shadow-card",
           reducedMotion ? "" : "transition-[transform,opacity,box-shadow] duration-300 ease-out",
-          isDragging ? "relative z-30 shadow-soft" : ""
+          isDragging ? "opacity-0 !transition-none" : ""
         ].join(" ")}
         ref={setNodeRef}
         style={sortableStyle}
@@ -83,11 +88,20 @@ export function ChecklistItemCard({
   return (
     <article
       className={[
-        "print-card cursor-pointer rounded-[1.35rem] bg-paper p-3 shadow-card sm:p-3.5",
-        reducedMotion ? "" : "transition-[transform,opacity,box-shadow,background-color] duration-300 ease-out",
-        settling ? "completion-success" : "hover:-translate-y-0.5 hover:shadow-soft",
-        isDragging ? "relative z-30 cursor-grabbing opacity-95 shadow-soft" : ""
+        "print-card min-w-0 cursor-pointer rounded-[1.35rem] bg-paper p-3 shadow-card sm:p-3.5",
+        reducedMotion ? "" : "transition-[opacity,box-shadow,background-color] duration-200 ease-out",
+        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:shadow-soft",
+        isDragging ? "opacity-0 !transition-none" : ""
       ].join(" ")}
+      onAnimationEnd={(event) => {
+        if (
+          collapsing &&
+          event.target === event.currentTarget &&
+          event.animationName === "completion-collapse"
+        ) {
+          onCollapseComplete(item.id);
+        }
+      }}
       onClick={toggleExpanded}
       ref={setNodeRef}
       style={sortableStyle}
@@ -113,7 +127,7 @@ export function ChecklistItemCard({
               <Check aria-hidden="true" size={completed ? 18 : 14} weight="bold" />
             </span>
           </button>
-          {settling ? (
+          {collapsing ? (
             <span aria-hidden="true" className="completion-particles">
               {Array.from({ length: 6 }, (_, index) => (
                 <span key={index} />
@@ -188,5 +202,27 @@ export function ChecklistItemCard({
         </div>
       </div>
     </article>
+  );
+}
+
+export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
+  return (
+    <div className="pointer-events-none flex h-[4.75rem] w-72 max-w-[calc(100vw-2rem)] items-start gap-2.5 overflow-hidden rounded-[1.25rem] border border-pine/10 bg-paper px-3 py-2.5 shadow-soft">
+      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-2xl border-2 border-black/10 bg-linen/80 text-transparent">
+        <Check aria-hidden="true" size={14} weight="bold" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="max-h-10 overflow-hidden text-[0.95rem] font-black leading-5 text-ink">
+          {item.title}
+        </p>
+        <div className="mt-1 flex gap-1.5">
+          <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
+          <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
+        </div>
+      </div>
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-2xl bg-blueSoft text-blueInk">
+        <DotsSixVertical aria-hidden="true" size={18} weight="bold" />
+      </span>
+    </div>
   );
 }

@@ -12,7 +12,7 @@ export function ProgressBar({
   return (
     <div
       className={[
-        "mt-2 h-2 overflow-hidden rounded-full bg-linen",
+        "mt-1.5 h-1.5 overflow-hidden rounded-full bg-linen sm:h-2",
         celebrating ? "progress-milestone" : ""
       ].join(" ")}
     >

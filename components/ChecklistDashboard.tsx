@@ -17,6 +17,7 @@ import type {
 const STORAGE_KEY = "before-you-land:tokyo:completed-items";
 const ORDER_STORAGE_KEY = "before-you-land:tokyo:item-order:v1";
 const MILESTONES = [25, 50, 75, 100];
+const FEEDBACK_FORM_URL = "";
 
 type TimingFilter = ChecklistTiming | "all";
 type ItemOrder = Record<string, string[]>;
@@ -29,7 +30,7 @@ export function ChecklistDashboard({
   items: ChecklistItem[];
 }) {
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
-  const [settlingIds, setSettlingIds] = useState<Set<string>>(new Set());
+  const [collapsingIds, setCollapsingIds] = useState<Set<string>>(new Set());
   const [itemOrder, setItemOrder] = useState<ItemOrder>(() => createDefaultOrder(categories, items));
   const [milestone, setMilestone] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
@@ -38,7 +39,6 @@ export function ChecklistDashboard({
   const [shareStatus, setShareStatus] = useState<string>("");
   const completedIdsRef = useRef<Set<string>>(new Set());
   const itemOrderRef = useRef<ItemOrder>(itemOrder);
-  const settlingTimersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const milestoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reducedMotion = usePrefersReducedMotion();
 
@@ -71,7 +71,6 @@ export function ChecklistDashboard({
 
   useEffect(
     () => () => {
-      settlingTimersRef.current.forEach((timer) => clearTimeout(timer));
       if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
     },
     []
@@ -130,30 +129,15 @@ export function ChecklistDashboard({
     setCompletedIds(next);
     persistCompletedIds(next);
 
-    const existingTimer = settlingTimersRef.current.get(id);
-    if (existingTimer) {
-      clearTimeout(existingTimer);
-      settlingTimersRef.current.delete(id);
-    }
-
     if (wasCompleted || reducedMotion) {
-      setSettlingIds((currentIds) => {
+      setCollapsingIds((currentIds) => {
         if (!currentIds.has(id)) return currentIds;
         const nextIds = new Set(currentIds);
         nextIds.delete(id);
         return nextIds;
       });
     } else {
-      setSettlingIds((currentIds) => new Set(currentIds).add(id));
-      const timer = setTimeout(() => {
-        setSettlingIds((currentIds) => {
-          const nextIds = new Set(currentIds);
-          nextIds.delete(id);
-          return nextIds;
-        });
-        settlingTimersRef.current.delete(id);
-      }, 500);
-      settlingTimersRef.current.set(id, timer);
+      setCollapsingIds((currentIds) => new Set(currentIds).add(id));
     }
 
     if (!wasCompleted) {
@@ -172,11 +156,9 @@ export function ChecklistDashboard({
   }
 
   function resetChecklist() {
-    settlingTimersRef.current.forEach((timer) => clearTimeout(timer));
-    settlingTimersRef.current.clear();
     completedIdsRef.current = new Set();
     setCompletedIds(new Set());
-    setSettlingIds(new Set());
+    setCollapsingIds(new Set());
     setMilestone(null);
     if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
     try {
@@ -186,6 +168,15 @@ export function ChecklistDashboard({
     }
     setShareLink("");
     setShareStatus("");
+  }
+
+  function finishCollapse(id: string) {
+    setCollapsingIds((currentIds) => {
+      if (!currentIds.has(id)) return currentIds;
+      const nextIds = new Set(currentIds);
+      nextIds.delete(id);
+      return nextIds;
+    });
   }
 
   function showMilestone(value: number) {
@@ -333,8 +324,8 @@ export function ChecklistDashboard({
         </aside>
 
         <div className="min-w-0 space-y-4">
-          <div className="no-print sticky top-2 z-20 max-w-full rounded-[1.35rem] bg-paper/94 p-3 shadow-card backdrop-blur sm:p-4 lg:rounded-[1.5rem]">
-            <div className="flex items-center gap-3">
+          <div className="no-print sticky top-2 z-40 isolate max-w-full rounded-[1.25rem] border border-white/70 bg-paper/95 p-2.5 shadow-card backdrop-blur-md sm:top-3 sm:p-3 lg:rounded-[1.5rem]">
+            <div className="flex items-center gap-2.5">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-3">
                   <p className="truncate text-sm font-black text-slate-600">
@@ -358,7 +349,7 @@ export function ChecklistDashboard({
                 <p
                   aria-live="polite"
                   className={[
-                    "mt-1.5 text-[11px] font-semibold leading-4",
+                    "mt-1 text-[10px] font-semibold leading-3 sm:text-[11px] sm:leading-4",
                     milestone ? "text-pine" : "text-slate-500",
                     milestone && !reducedMotion ? "milestone-message" : ""
                   ].join(" ")}
@@ -373,7 +364,7 @@ export function ChecklistDashboard({
 
               <button
                 aria-label="Share this checklist"
-                className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-3 text-sm font-black text-white shadow-tile transition hover:bg-pine"
+                className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-2.5 text-sm font-black text-white shadow-tile transition hover:bg-pine sm:min-h-10 sm:px-3"
                 onClick={shareChecklist}
                 type="button"
               >
@@ -400,13 +391,14 @@ export function ChecklistDashboard({
               {sections.map((section) => (
                 <ChecklistSection
                   category={section.category}
+                  collapsingIds={collapsingIds}
                   completedIds={completedIds}
                   items={section.items}
                   key={section.category.id}
+                  onCollapseComplete={finishCollapse}
                   onReorder={reorderVisibleItems}
                   onToggle={toggleItem}
                   reducedMotion={reducedMotion}
-                  settlingIds={settlingIds}
                 />
               ))}
             </div>
@@ -418,6 +410,8 @@ export function ChecklistDashboard({
               </p>
             </div>
           )}
+
+          {FEEDBACK_FORM_URL ? <ChecklistFeedback formUrl={FEEDBACK_FORM_URL} /> : null}
 
           <div className="no-print flex justify-end pt-1">
             <button
@@ -432,6 +426,49 @@ export function ChecklistDashboard({
         </div>
       </div>
     </div>
+  );
+}
+
+function ChecklistFeedback({ formUrl }: { formUrl: string }) {
+  const [response, setResponse] = useState<"yes" | "somewhat" | "no" | null>(null);
+
+  return (
+    <section className="no-print rounded-[1.35rem] bg-paper p-4 shadow-card" aria-labelledby="checklist-feedback">
+      <h2 className="text-base font-black text-ink" id="checklist-feedback">
+        Was this checklist useful?
+      </h2>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(["yes", "somewhat", "no"] as const).map((value) => (
+          <button
+            aria-pressed={response === value}
+            className={[
+              "min-h-9 rounded-full px-3 text-sm font-black transition",
+              response === value
+                ? "bg-ink text-white shadow-tile"
+                : "bg-linen text-slate-600 hover:bg-white hover:text-ink"
+            ].join(" ")}
+            key={value}
+            onClick={() => setResponse(value)}
+            type="button"
+          >
+            {value === "yes" ? "Yes" : value === "somewhat" ? "Somewhat" : "No"}
+          </button>
+        ))}
+      </div>
+      {response ? (
+        <div className="mt-3 border-t border-black/5 pt-3">
+          <p className="text-sm font-bold text-slate-600">What was missing or confusing?</p>
+          <a
+            className="mt-2 inline-flex min-h-9 items-center justify-center rounded-full bg-pine px-4 text-sm font-black text-white transition hover:bg-ink"
+            href={formUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            Share feedback
+          </a>
+        </div>
+      ) : null}
+    </section>
   );
 }
 
