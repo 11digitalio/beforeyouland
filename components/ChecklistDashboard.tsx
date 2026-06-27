@@ -228,6 +228,9 @@ export function ChecklistDashboard({
                   <p className="shrink-0 text-sm font-black text-pine">{progress}%</p>
                 </div>
                 <ProgressBar value={progress} />
+                <p className="mt-1.5 text-[11px] font-semibold leading-4 text-slate-500">
+                  Progress saves automatically on this device.
+                </p>
               </div>
 
               <button

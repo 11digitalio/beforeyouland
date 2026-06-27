@@ -25,9 +25,14 @@ export default function TokyoChecklistPage() {
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
               Built for a U.S. passport holder visiting Tokyo as a first-time solo traveler for under
-              90 days. Travel rules change. Always verify entry requirements with official government
-              sources before booking or flying.
+              90 days.
             </p>
+            <div className="mt-4 max-w-2xl rounded-[1.25rem] border border-black/5 bg-paper px-4 py-3 shadow-tile">
+              <p className="text-xs font-black text-ink">Last updated: June 2026</p>
+              <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
+                Travel requirements can change. Verify official sources before booking or flying.
+              </p>
+            </div>
           </div>
 
           <ChecklistDashboard categories={tokyoChecklistCategories} items={tokyoChecklistItems} />

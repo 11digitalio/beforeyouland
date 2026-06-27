@@ -107,7 +107,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Check customs and declaration requirements",
     description:
       "Know what must be declared, especially medication, restricted goods, large cash amounts, or duty-free purchases.",
-    priority: "recommended",
+    priority: "required",
     timing: "before-flight",
     category: "Entry & Documents",
     link: {
@@ -120,7 +120,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Save proof of onward or return travel",
     description:
       "Keep your return flight or onward itinerary accessible offline in case an airline or border officer asks for it.",
-    priority: "recommended",
+    priority: "required",
     timing: "before-flight",
     category: "Entry & Documents"
   },
@@ -138,7 +138,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Bring a physical backup card",
     description:
       "Carry a second physical card separately from your main wallet in case a card is declined, lost, or unsupported.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Money & Payments"
   },
@@ -174,7 +174,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Confirm your phone is unlocked before buying an eSIM",
     description:
       "Check carrier lock status before purchase so your eSIM or travel SIM works as soon as you land.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Phone & Internet"
   },
@@ -183,7 +183,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Set up eSIM or roaming plan",
     description:
       "Choose an eSIM, pocket Wi-Fi, SIM pickup, or carrier roaming plan before departure so you can navigate immediately after landing.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Phone & Internet"
   },
@@ -201,7 +201,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Learn airport train options from Haneda or Narita",
     description:
       "Identify whether Tokyo Monorail, Keikyu, Narita Express, Keisei Skyliner, or another route fits your arrival.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Transportation"
   },
@@ -210,7 +210,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Save your airport-to-hotel route",
     description:
       "Save the exact route, transfer station, fare estimate, and final walking directions before boarding your flight.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Transportation"
   },
@@ -246,7 +246,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Download Google Maps",
     description:
       "Use it for walking directions, station routing, and the last few turns from the station to your hotel.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Apps to Download",
     link: {
@@ -259,7 +259,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Download Google Translate",
     description:
       "Download Japanese for offline use and test camera translation before you need it at a menu, sign, or machine.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Apps to Download",
     link: {
@@ -324,7 +324,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Confirm your arrival airport and terminal",
     description:
       "Tokyo-area trips may land at Haneda or Narita. Save the correct terminal before comparing train or taxi options.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Airport Arrival"
   },
@@ -369,7 +369,7 @@ export const tokyoChecklistItems: ChecklistItem[] = [
     title: "Save emergency numbers",
     description:
       "Store 110 for police and 119 for fire or ambulance, plus your hotel phone number and nearest embassy contact.",
-    priority: "required",
+    priority: "recommended",
     timing: "before-flight",
     category: "Culture & Safety",
     link: {

@@ -46,7 +46,7 @@ const previewSections = tokyoChecklistCategories.slice(0, 6);
 export default function Home() {
   return (
     <Layout>
-      <Hero />
+      <Hero taskCount={tokyoChecklistItems.length} />
 
       <section className="px-4 pb-12 pt-12 sm:px-6 sm:pt-16 lg:px-8">
         <div className="mx-auto grid max-w-6xl gap-5 lg:grid-cols-[1.02fr_0.98fr] lg:items-start">
@@ -153,7 +153,7 @@ export default function Home() {
             eventName="open_checklist_clicked"
             href="/tokyo"
           >
-            Build my Tokyo checklist
+            Open the Tokyo checklist
             <IconTile className="shadow-none" icon={ArrowRight} size="sm" tone="ink" />
           </TrackedLink>
         </div>

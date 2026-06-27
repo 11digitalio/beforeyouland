@@ -1,11 +1,16 @@
-import { AirplaneTilt, ArrowRight, CreditCard, GlobeHemisphereEast } from "@phosphor-icons/react/dist/ssr";
+import {
+  AirplaneTilt,
+  ArrowRight,
+  GlobeHemisphereEast,
+  IdentificationCard
+} from "@phosphor-icons/react/dist/ssr";
 import { IconTile } from "@/components/IconTile";
 import { TrackedLink } from "@/components/TrackedLink";
 
 const heroImage =
   "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1800&q=80";
 
-export function Hero() {
+export function Hero({ taskCount }: { taskCount: number }) {
   return (
     <section className="relative isolate overflow-hidden bg-linen">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 sm:py-14 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-8 lg:py-16">
@@ -27,21 +32,21 @@ export function Hero() {
               eventName="open_checklist_clicked"
               href="/tokyo"
             >
-              Build my Tokyo checklist
+              Open the Tokyo checklist
               <IconTile className="shadow-none" icon={ArrowRight} size="sm" tone="cream" />
             </TrackedLink>
             <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-600">
               <span className="inline-flex items-center gap-2 rounded-full bg-paper px-3 py-1.5 shadow-tile">
-                <IconTile className="shadow-none" icon={AirplaneTilt} size="sm" tone="blue" />
-                Under 90 days
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-paper px-3 py-1.5 shadow-tile">
-                <IconTile className="shadow-none" icon={CreditCard} size="sm" tone="green" />
-                U.S. passport
+                <IconTile className="shadow-none" icon={IdentificationCard} size="sm" tone="green" />
+                U.S. passport holders
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-paper px-3 py-1.5 shadow-tile">
                 <IconTile className="shadow-none" icon={GlobeHemisphereEast} size="sm" tone="orange" />
-                Solo-ready
+                First-time Tokyo visitors
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-paper px-3 py-1.5 shadow-tile">
+                <IconTile className="shadow-none" icon={AirplaneTilt} size="sm" tone="blue" />
+                Solo trips under 90 days
               </span>
             </div>
           </div>
@@ -59,7 +64,7 @@ export function Hero() {
               <IconTile icon={GlobeHemisphereEast} tone="green" />
               <div>
                 <p className="text-sm font-black text-ink">Tokyo ready list</p>
-                <p className="text-xs font-semibold text-slate-500">44 compact tasks</p>
+                <p className="text-xs font-semibold text-slate-500">{taskCount} compact tasks</p>
               </div>
             </div>
           </div>
