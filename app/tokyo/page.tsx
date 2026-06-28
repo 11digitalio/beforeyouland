@@ -14,13 +14,13 @@ export const metadata: Metadata = {
 export default function TokyoChecklistPage() {
   return (
     <Layout>
-      <section className="px-4 pb-16 pt-5 sm:px-6 sm:pt-7 lg:px-8">
+      <section className="min-h-screen bg-[#F7F6F1] px-4 pb-16 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-clay">
               Tokyo arrival dashboard
             </p>
-            <h1 className="mt-2 text-[2rem] font-black leading-[1.08] tracking-normal text-ink sm:text-4xl">
+            <h1 className="mt-1.5 text-[34px] font-black leading-[1.06] tracking-normal text-ink sm:mt-2 sm:text-4xl sm:leading-[1.08]">
               Your Tokyo pre-landing checklist
             </h1>
             <p className="mt-2.5 max-w-2xl text-sm font-normal leading-5 text-slate-600 sm:text-base sm:leading-6">

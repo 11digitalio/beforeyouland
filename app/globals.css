@@ -62,66 +62,13 @@ input {
   animation: complete-settle 220ms ease-out;
 }
 
-@keyframes completion-success {
-  0% {
-    background-color: #ffffff;
-    box-shadow: 0 8px 24px rgba(17, 17, 17, 0.06);
-  }
-
-  38% {
-    background-color: #e5f5e9;
-    box-shadow: 0 10px 28px rgba(15, 76, 69, 0.16);
-  }
-
-  100% {
-    background-color: #ffffff;
-    box-shadow: 0 8px 24px rgba(17, 17, 17, 0.06);
-  }
-}
-
-@keyframes completion-collapse {
-  0% {
-    max-height: 14rem;
-    opacity: 1;
-  }
-
-  100% {
-    max-height: 3rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    opacity: 0.62;
-  }
-}
-
 @keyframes checkmark-reveal {
   0% {
     opacity: 0;
-    transform: scale(0.35) rotate(-18deg);
   }
 
   100% {
     opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-}
-
-@keyframes particle-burst {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-
-  24% {
-    opacity: 0.8;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(
-        calc(-50% + var(--particle-x)),
-        calc(-50% + var(--particle-y))
-      )
-      scale(0);
   }
 }
 
@@ -162,63 +109,19 @@ input {
 
 .completion-collapsing {
   overflow: hidden;
-  animation:
-    completion-success 320ms ease-out,
-    completion-collapse 240ms 80ms ease-in forwards;
+  max-height: 3rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  opacity: 0.62;
+  transition:
+    max-height 200ms ease,
+    padding 200ms ease,
+    opacity 200ms ease;
 }
 
 .checkmark-reveal {
   display: inline-flex;
-  animation: checkmark-reveal 220ms cubic-bezier(0.2, 0.9, 0.35, 1.2);
-}
-
-.completion-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.completion-particles span {
-  --particle-x: 0px;
-  --particle-y: -16px;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: #3d9b78;
-  animation: particle-burst 300ms ease-out forwards;
-}
-
-.completion-particles span:nth-child(2) {
-  --particle-x: 14px;
-  --particle-y: -8px;
-  animation-delay: 20ms;
-}
-
-.completion-particles span:nth-child(3) {
-  --particle-x: 14px;
-  --particle-y: 9px;
-  animation-delay: 35ms;
-}
-
-.completion-particles span:nth-child(4) {
-  --particle-x: 0px;
-  --particle-y: 16px;
-  animation-delay: 20ms;
-}
-
-.completion-particles span:nth-child(5) {
-  --particle-x: -14px;
-  --particle-y: 9px;
-  animation-delay: 35ms;
-}
-
-.completion-particles span:nth-child(6) {
-  --particle-x: -14px;
-  --particle-y: -8px;
-  animation-delay: 20ms;
+  animation: checkmark-reveal 150ms ease-out;
 }
 
 .progress-number-change {
@@ -247,8 +150,8 @@ input {
     animation: none;
   }
 
-  .completion-particles {
-    display: none;
+  .completion-collapsing {
+    transition: none;
   }
 }
 

@@ -239,7 +239,7 @@ export function ChecklistDashboard({
   }
 
   return (
-    <div className="mt-4 min-w-0 lg:mt-6">
+    <div className="mt-3 min-w-0 lg:mt-6">
       <div className="no-print mb-2.5 flex min-w-0 items-center gap-2 lg:mb-3">
         <div className="relative min-w-0 flex-1 lg:hidden">
           <select
@@ -403,6 +403,9 @@ export function ChecklistDashboard({
             <div className="print-grid space-y-6">
               {sections.map((section) => (
                 <ChecklistSection
+                  allItemsComplete={items
+                    .filter((item) => item.category === section.category.title)
+                    .every((item) => completedIds.has(item.id))}
                   category={section.category}
                   collapsingIds={collapsingIds}
                   completedIds={completedIds}

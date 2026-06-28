@@ -45,13 +45,13 @@ export function ChecklistItemCard({
   } = useSortable({
     id: item.id,
     disabled: completed || !reorderMode,
-    animateLayoutChanges: () => !reducedMotion
+    animateLayoutChanges: () => false
   });
   const sortableStyle = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0) scaleX(${transform.scaleX}) scaleY(${transform.scaleY})`
       : undefined,
-    transition: reducedMotion || isDragging ? undefined : transition,
+    transition: reducedMotion || isDragging || !reorderMode ? undefined : transition,
     willChange: isDragging ? "transform" : undefined
   };
 
@@ -64,7 +64,6 @@ export function ChecklistItemCard({
       <article
         className={[
           "print-card rounded-lg border border-black/5 bg-paper opacity-60",
-          reducedMotion ? "" : "transition-[transform,opacity,box-shadow] duration-300 ease-out",
           isDragging ? "opacity-0 !transition-none" : ""
         ].join(" ")}
         ref={setNodeRef}
@@ -91,15 +90,16 @@ export function ChecklistItemCard({
     <article
       className={[
         "print-card min-w-0 cursor-pointer rounded-lg border border-black/5 bg-paper p-2.5",
+        expanded && !collapsing ? "max-h-[30rem]" : "max-h-28",
         reducedMotion ? "" : "transition-[opacity,box-shadow,background-color] duration-200 ease-out",
         collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:border-black/10 hover:bg-white",
         isDragging ? "opacity-0 !transition-none" : ""
       ].join(" ")}
-      onAnimationEnd={(event) => {
+      onTransitionEnd={(event) => {
         if (
           collapsing &&
           event.target === event.currentTarget &&
-          event.animationName === "completion-collapse"
+          event.propertyName === "max-height"
         ) {
           onCollapseComplete(item.id);
         }
@@ -109,12 +109,12 @@ export function ChecklistItemCard({
       style={sortableStyle}
     >
       <div className="flex gap-2">
-        <div className="relative size-7 shrink-0">
+        <div className="relative size-6 shrink-0">
           <button
             aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
             className={[
-              "check-control no-print -m-2 flex size-11 items-center justify-center rounded-lg active:scale-95",
-              reducedMotion ? "" : "transition-[transform,background-color,border-color,color] duration-200",
+              "check-control no-print absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg",
+              reducedMotion ? "" : "transition-colors duration-150",
               completed
                 ? "is-checked text-white"
                 : "text-transparent focus-visible:text-pine"
@@ -127,23 +127,16 @@ export function ChecklistItemCard({
           >
             <span
               className={[
-                "flex size-7 items-center justify-center rounded-lg border-2",
+                "flex size-6 items-center justify-center rounded-md border-2 transition-colors duration-150",
                 completed
                   ? "border-pine bg-pine shadow-tile"
                   : "border-black/10 bg-linen/80 group-hover:border-pine/35",
                 completed ? "checkmark-reveal" : ""
               ].join(" ")}
             >
-              <Check aria-hidden="true" size={completed ? 15 : 12} weight="bold" />
+              <Check aria-hidden="true" size={completed ? 14 : 11} weight="bold" />
             </span>
           </button>
-          {collapsing ? (
-            <span aria-hidden="true" className="completion-particles">
-              {Array.from({ length: 6 }, (_, index) => (
-                <span key={index} />
-              ))}
-            </span>
-          ) : null}
         </div>
 
         <div className="min-w-0 flex-1">

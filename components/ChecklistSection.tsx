@@ -17,7 +17,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
-import { useCallback, useRef, useState } from "react";
+import { CaretDown, Check } from "@phosphor-icons/react/dist/ssr";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChecklistDragPreview, ChecklistItemCard } from "@/components/ChecklistItemCard";
 import { IconTile } from "@/components/IconTile";
 import { getCategoryVisual } from "@/components/categoryIcons";
@@ -26,6 +27,7 @@ import type { ChecklistCategoryDefinition, ChecklistItem } from "@/types/checkli
 export function ChecklistSection({
   category,
   items,
+  allItemsComplete,
   completedIds,
   collapsingIds,
   reducedMotion,
@@ -36,6 +38,7 @@ export function ChecklistSection({
 }: {
   category: ChecklistCategoryDefinition;
   items: ChecklistItem[];
+  allItemsComplete: boolean;
   completedIds: Set<string>;
   collapsingIds: Set<string>;
   reducedMotion: boolean;
@@ -45,6 +48,7 @@ export function ChecklistSection({
   reorderMode: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [showCompletedSection, setShowCompletedSection] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const completedCount = items.filter((item) => completedIds.has(item.id)).length;
   const sortedItems = [...items].sort(
@@ -54,6 +58,8 @@ export function ChecklistSection({
   );
   const activeItem = activeId ? items.find((item) => item.id === activeId) : undefined;
   const visual = getCategoryVisual(category.title);
+  const sectionCollapseReady =
+    allItemsComplete && !items.some((item) => collapsingIds.has(item.id));
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
@@ -92,6 +98,33 @@ export function ChecklistSection({
 
     if (oldIndex < 0 || newIndex < 0) return;
     onReorder(category.title, arrayMove(incompleteIds, oldIndex, newIndex));
+  }
+
+  useEffect(() => {
+    if (!allItemsComplete) setShowCompletedSection(false);
+  }, [allItemsComplete]);
+
+  if (sectionCollapseReady && !showCompletedSection) {
+    return (
+      <section aria-labelledby={category.id}>
+        <button
+          aria-expanded="false"
+          className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-black/5 bg-paper px-2.5 py-1.5 text-left transition-colors hover:bg-white"
+          onClick={() => setShowCompletedSection(true)}
+          type="button"
+        >
+          <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
+          <span className="min-w-0 flex-1 truncate text-sm font-black text-ink" id={category.id}>
+            {category.title}
+          </span>
+          <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-pine">
+            <Check aria-hidden="true" size={14} weight="bold" />
+            Complete
+          </span>
+          <CaretDown aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
+        </button>
+      </section>
+    );
   }
 
   return (
