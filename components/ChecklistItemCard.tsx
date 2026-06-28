@@ -63,7 +63,7 @@ export function ChecklistItemCard({
     return (
       <article
         className={[
-          "print-card rounded-lg border border-black/5 bg-paper opacity-60",
+          "print-card border-b border-[#E5E5EA] bg-white opacity-60 last:border-b-0",
           isDragging ? "opacity-0 !transition-none" : ""
         ].join(" ")}
         ref={setNodeRef}
@@ -71,14 +71,14 @@ export function ChecklistItemCard({
       >
         <button
           aria-label={`Mark ${item.title} incomplete`}
-          className="flex min-h-11 w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left transition hover:bg-greenSoft/50 active:bg-greenSoft"
+          className="flex min-h-11 w-full items-center gap-3 px-3 py-2 text-left transition hover:bg-[#F9F9F9]"
           onClick={() => onToggle(item.id)}
           type="button"
         >
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-pine text-white">
-            <Check aria-hidden="true" size={14} weight="bold" />
+          <span className="flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#007AFF] text-white">
+            <Check aria-hidden="true" size={13} weight="bold" />
           </span>
-          <span className="min-w-0 flex-1 text-sm font-bold leading-[1.2] text-slate-500 line-through decoration-slate-400">
+          <span className="min-w-0 flex-1 text-[15px] font-normal leading-5 text-[#8E8E93] line-through decoration-[#AEAEB2]">
             {item.title}
           </span>
         </button>
@@ -89,10 +89,10 @@ export function ChecklistItemCard({
   return (
     <article
       className={[
-        "print-card min-w-0 cursor-pointer rounded-lg border border-black/5 bg-paper p-2.5",
+        "print-card min-w-0 cursor-pointer border-b border-[#E5E5EA] bg-white px-3 py-2 last:border-b-0",
         expanded && !collapsing ? "max-h-[30rem]" : "max-h-28",
-        reducedMotion ? "" : "transition-[opacity,box-shadow,background-color] duration-200 ease-out",
-        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:border-black/10 hover:bg-white",
+        reducedMotion ? "" : "transition-[opacity,background-color] duration-200 ease-out",
+        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:bg-[#FAFAFA]",
         isDragging ? "opacity-0 !transition-none" : ""
       ].join(" ")}
       onTransitionEnd={(event) => {
@@ -108,8 +108,8 @@ export function ChecklistItemCard({
       ref={setNodeRef}
       style={sortableStyle}
     >
-      <div className="flex gap-2">
-        <div className="relative size-6 shrink-0">
+      <div className="flex gap-3">
+        <div className="relative size-[22px] shrink-0">
           <button
             aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
             className={[
@@ -117,7 +117,7 @@ export function ChecklistItemCard({
               reducedMotion ? "" : "transition-colors duration-150",
               completed
                 ? "is-checked text-white"
-                : "text-transparent focus-visible:text-pine"
+                : "text-transparent focus-visible:text-[#007AFF]"
             ].join(" ")}
             onClick={(event) => {
               event.stopPropagation();
@@ -127,10 +127,10 @@ export function ChecklistItemCard({
           >
             <span
               className={[
-                "flex size-6 items-center justify-center rounded-md border-2 transition-colors duration-150",
+                "flex size-[22px] items-center justify-center rounded-full border transition-colors duration-150",
                 completed
-                  ? "border-pine bg-pine shadow-tile"
-                  : "border-black/10 bg-linen/80 group-hover:border-pine/35",
+                  ? "border-[#007AFF] bg-[#007AFF]"
+                  : "border-[#AEAEB2] bg-white",
                 completed ? "checkmark-reveal" : ""
               ].join(" ")}
             >
@@ -140,11 +140,11 @@ export function ChecklistItemCard({
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start gap-2">
+          <div className="flex min-h-7 items-start gap-1">
             <h3
               className={[
-                "min-w-0 flex-1 text-base font-black leading-[1.2] tracking-normal text-ink",
-                completed ? "text-slate-500 line-through decoration-slate-400 decoration-2" : ""
+                "min-w-0 flex-1 pt-0.5 text-[16px] font-normal leading-[21px] tracking-[-0.005em] text-[#1D1D1F]",
+                completed ? "text-[#8E8E93] line-through decoration-[#AEAEB2]" : ""
               ].join(" ")}
             >
               {item.title}
@@ -155,7 +155,7 @@ export function ChecklistItemCard({
                 {...attributes}
                 {...listeners}
                 aria-label={`Reorder ${item.title}`}
-                className="no-print -m-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center rounded-lg text-slate-500 transition hover:bg-blueSoft hover:text-blueInk active:cursor-grabbing active:scale-95"
+                className="no-print -my-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center rounded-lg text-[#8E8E93] transition hover:bg-[#F2F2F7] active:cursor-grabbing"
                 onClick={(event) => event.stopPropagation()}
                 ref={setActivatorNodeRef}
                 type="button"
@@ -167,7 +167,7 @@ export function ChecklistItemCard({
             <button
               aria-expanded={expanded}
               aria-label={expanded ? `Hide details for ${item.title}` : `Show details for ${item.title}`}
-              className="no-print -m-2 ml-0 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-greenSoft hover:text-pine active:scale-95"
+                className="no-print -my-2 -mr-2 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-[#8E8E93] transition hover:bg-[#F2F2F7] hover:text-[#3A3A3C]"
               onClick={(event) => {
                 event.stopPropagation();
                 toggleExpanded();
@@ -175,32 +175,32 @@ export function ChecklistItemCard({
               type="button"
             >
               {expanded ? (
-                <CaretUp aria-hidden="true" size={14} weight="bold" />
+                <CaretUp aria-hidden="true" size={12} />
               ) : (
-                <CaretDown aria-hidden="true" size={14} weight="bold" />
+                <CaretDown aria-hidden="true" size={12} />
               )}
             </button>
           </div>
 
-          <div className="mt-1.5 flex flex-wrap gap-1">
+          <div className="mt-1 flex flex-wrap gap-1">
             <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
             <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
+          </div>
+
+          <div className={expanded ? "mt-2 border-t border-[#E5E5EA] pt-2 block" : "hidden print:block"}>
+            <p className="text-[14px] leading-5 text-[#6E6E73]">{item.description}</p>
             {item.link ? (
               <a
-                className="no-print inline-flex min-h-6 max-w-full items-center gap-1 rounded-full bg-ink px-2 text-[10px] font-black text-white transition hover:bg-soot"
+                className="no-print mt-2 inline-flex min-h-9 max-w-full items-center gap-1 rounded-md bg-[#EEF5FF] px-2.5 text-[13px] font-medium text-[#007AFF] transition hover:bg-[#E2EFFF]"
                 href={item.link.url}
                 onClick={(event) => event.stopPropagation()}
                 rel="noreferrer"
                 target="_blank"
               >
-                <ArrowSquareOut aria-hidden="true" className="shrink-0" size={11} weight="bold" />
+                <ArrowSquareOut aria-hidden="true" className="shrink-0" size={12} />
                 <span className="truncate">{item.link.label}</span>
               </a>
             ) : null}
-          </div>
-
-          <div className={expanded ? "mt-2 block" : "hidden print:block"}>
-            <p className="text-sm leading-5 text-slate-600">{item.description}</p>
           </div>
         </div>
       </div>
@@ -210,12 +210,12 @@ export function ChecklistItemCard({
 
 export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
   return (
-    <div className="pointer-events-none flex h-[4.75rem] w-72 max-w-[calc(100vw-2rem)] items-start gap-2.5 overflow-hidden rounded-[1.25rem] border border-pine/10 bg-paper px-3 py-2.5 shadow-soft">
-      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-2xl border-2 border-black/10 bg-linen/80 text-transparent">
+    <div className="pointer-events-none flex h-[4.75rem] w-72 max-w-[calc(100vw-2rem)] items-start gap-2.5 overflow-hidden rounded-[10px] border border-[#D1D1D6] bg-white px-3 py-2.5 shadow-[0_5px_18px_rgba(0,0,0,0.12)]">
+      <span className="mt-0.5 flex size-[22px] shrink-0 items-center justify-center rounded-full border border-[#AEAEB2] bg-white text-transparent">
         <Check aria-hidden="true" size={14} weight="bold" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="max-h-10 overflow-hidden text-[0.95rem] font-black leading-5 text-ink">
+        <p className="max-h-10 overflow-hidden text-[15px] font-medium leading-5 text-[#1D1D1F]">
           {item.title}
         </p>
         <div className="mt-1 flex gap-1.5">
@@ -223,7 +223,7 @@ export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
           <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
         </div>
       </div>
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-2xl bg-blueSoft text-blueInk">
+      <span className="flex size-8 shrink-0 items-center justify-center text-[#8E8E93]">
         <DotsSixVertical aria-hidden="true" size={18} weight="bold" />
       </span>
     </div>

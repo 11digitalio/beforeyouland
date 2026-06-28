@@ -12,14 +12,14 @@ export function ProgressBar({
   return (
     <div
       className={[
-        "mt-1.5 h-1.5 overflow-hidden rounded-full bg-linen sm:h-2",
+        "mt-1.5 h-1 overflow-hidden rounded-full bg-[#E5E5EA]",
         celebrating ? "progress-milestone" : ""
       ].join(" ")}
     >
       <div
         aria-label={`${safeValue}% completed`}
         className={[
-          "h-full rounded-full bg-pine",
+          "h-full rounded-full bg-[#007AFF]",
           reducedMotion ? "" : "transition-[width] duration-500 ease-out"
         ].join(" ")}
         role="progressbar"
