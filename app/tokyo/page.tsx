@@ -14,24 +14,22 @@ export const metadata: Metadata = {
 export default function TokyoChecklistPage() {
   return (
     <Layout>
-      <section className="px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <section className="px-4 pb-16 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="max-w-3xl">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-clay">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-clay">
               Tokyo arrival dashboard
             </p>
-            <h1 className="mt-3 text-4xl font-black tracking-normal text-ink sm:text-5xl">
+            <h1 className="mt-2 text-[2rem] font-black leading-[1.08] tracking-normal text-ink sm:text-4xl">
               Your Tokyo pre-landing checklist
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+            <p className="mt-2.5 max-w-2xl text-sm font-normal leading-5 text-slate-600 sm:text-base sm:leading-6">
               Built for a U.S. passport holder visiting Tokyo as a first-time solo traveler for under
               90 days.
             </p>
-            <div className="mt-4 max-w-2xl rounded-[1.25rem] border border-black/5 bg-paper px-4 py-3 shadow-tile">
-              <p className="text-xs font-black text-ink">Last updated: June 2026</p>
-              <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
-                Travel requirements can change. Verify official sources before booking or flying.
-              </p>
+            <div className="mt-2.5 max-w-2xl border-l-2 border-clay/40 pl-3 text-sm leading-5 text-slate-500">
+              <span className="font-bold text-ink">Last updated: June 2026.</span>{" "}
+              Travel requirements can change. Verify official sources before booking or flying.
             </div>
           </div>
 

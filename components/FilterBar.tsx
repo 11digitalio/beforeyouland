@@ -18,9 +18,8 @@ export function FilterBar({
   setTimingFilter: (value: TimingFilter) => void;
 }) {
   return (
-    <div aria-label="When" className="mt-1.5 min-w-0 border-t border-black/5 pt-1.5" role="group">
-      <div className="-mx-0.5 max-w-full overflow-x-auto px-0.5">
-        <div className="flex min-w-max gap-1">
+    <div aria-label="When" className="mt-1 min-w-0 border-t border-black/5 pt-1" role="group">
+      <div className="grid min-w-0 grid-cols-4 gap-1">
           {timingOptions.map((option) => (
             <button
               aria-pressed={timingFilter === option.value}
@@ -32,7 +31,6 @@ export function FilterBar({
               {option.label}
             </button>
           ))}
-        </div>
       </div>
     </div>
   );
@@ -40,7 +38,7 @@ export function FilterBar({
 
 function chipClasses(active: boolean) {
   return [
-    "min-h-7 shrink-0 rounded-full px-2 text-[10px] font-black transition min-[390px]:px-2.5 min-[390px]:text-[11px] sm:min-h-8 sm:px-3 sm:text-xs",
+    "min-h-10 min-w-0 whitespace-nowrap rounded-md px-1 text-[10px] font-bold transition sm:min-h-11 sm:px-2 sm:text-xs",
     active
       ? "bg-ink text-white shadow-tile"
       : "bg-linen text-slate-600 hover:bg-white hover:text-ink"

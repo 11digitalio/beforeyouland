@@ -31,7 +31,8 @@ export function ChecklistSection({
   reducedMotion,
   onCollapseComplete,
   onReorder,
-  onToggle
+  onToggle,
+  reorderMode
 }: {
   category: ChecklistCategoryDefinition;
   items: ChecklistItem[];
@@ -41,6 +42,7 @@ export function ChecklistSection({
   onCollapseComplete: (id: string) => void;
   onReorder: (category: string, visibleIncompleteIds: string[]) => void;
   onToggle: (id: string) => void;
+  reorderMode: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -94,19 +96,14 @@ export function ChecklistSection({
 
   return (
     <section aria-labelledby={category.id}>
-      <div className="mb-2.5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex items-start gap-3">
-          <IconTile icon={visual.icon} tone={visual.tone} />
-          <div>
-            <h2 className="text-2xl font-black tracking-normal text-ink" id={category.id}>
-              {category.title}
+      <div className="mb-2 flex items-start gap-2">
+          <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
+          <div className="min-w-0">
+            <h2 className="text-lg font-black leading-6 tracking-normal text-ink sm:text-xl" id={category.id}>
+              {category.title} <span className="text-sm font-bold text-slate-500">· {completedCount}/{items.length}</span>
             </h2>
-            <p className="mt-1 max-w-2xl text-sm leading-5 text-slate-600">{category.summary}</p>
+            <p className="mt-0.5 hidden max-w-2xl text-sm leading-5 text-slate-600 sm:block">{category.summary}</p>
           </div>
-        </div>
-        <p className="text-sm font-black text-slate-500">
-          {completedCount}/{items.length} done
-        </p>
       </div>
 
       <DndContext
@@ -132,6 +129,7 @@ export function ChecklistSection({
                 key={item.id}
                 onCollapseComplete={onCollapseComplete}
                 onToggle={onToggle}
+                reorderMode={reorderMode}
                 reducedMotion={reducedMotion}
               />
             ))}

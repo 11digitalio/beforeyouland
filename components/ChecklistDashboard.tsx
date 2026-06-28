@@ -35,6 +35,7 @@ export function ChecklistDashboard({
   const [milestone, setMilestone] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [timingFilter, setTimingFilter] = useState<TimingFilter>("all");
+  const [reorderMode, setReorderMode] = useState(false);
   const [shareLink, setShareLink] = useState<string>("");
   const [shareStatus, setShareStatus] = useState<string>("");
   const completedIdsRef = useRef<Set<string>>(new Set());
@@ -238,12 +239,12 @@ export function ChecklistDashboard({
   }
 
   return (
-    <div className="mt-5 min-w-0 lg:mt-7">
-      <div className="no-print mb-3 min-w-0 lg:hidden">
-        <div className="relative">
+    <div className="mt-4 min-w-0 lg:mt-6">
+      <div className="no-print mb-2.5 flex min-w-0 items-center gap-2 lg:mb-3">
+        <div className="relative min-w-0 flex-1 lg:hidden">
           <select
             aria-label="Category"
-            className="min-h-12 w-full appearance-none rounded-[1.25rem] border border-black/5 bg-paper py-3 pl-4 pr-11 text-[15px] font-black leading-none text-ink shadow-card outline-none transition focus:border-pine/30 focus:bg-white"
+            className="min-h-11 w-full appearance-none rounded-lg border border-black/10 bg-paper py-2 pl-3 pr-9 text-sm font-bold leading-none text-ink outline-none transition focus:border-pine/30 focus:bg-white"
             id="mobile-category-filter"
             onChange={(event) => setActiveCategory(event.target.value)}
             value={activeCategory}
@@ -260,23 +261,47 @@ export function ChecklistDashboard({
           </select>
           <CaretDown
             aria-hidden="true"
-            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
-            size={17}
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            size={15}
             weight="bold"
           />
+        </div>
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <button
+            aria-pressed={reorderMode}
+            className={[
+              "inline-flex min-h-11 items-center justify-center rounded-lg px-2.5 text-xs font-bold transition",
+              reorderMode
+                ? "bg-blueSoft text-blueInk"
+                : "border border-black/10 bg-paper text-slate-600 hover:bg-linen"
+            ].join(" ")}
+            onClick={() => setReorderMode((current) => !current)}
+            type="button"
+          >
+            Reorder
+          </button>
+          <button
+            aria-label="Share this checklist"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-ink px-2.5 text-xs font-bold text-white transition hover:bg-pine"
+            onClick={shareChecklist}
+            type="button"
+          >
+            <ShareFat aria-hidden="true" size={15} weight="bold" />
+            <span className="hidden min-[360px]:inline">Share</span>
+          </button>
         </div>
       </div>
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-5">
         <aside className="no-print hidden lg:sticky lg:top-5 lg:block lg:self-start">
-          <div className="rounded-[1.75rem] bg-paper p-3 shadow-card">
+          <div className="rounded-xl border border-black/5 bg-paper p-2">
             <div className="flex items-center gap-2 px-2 py-1">
               <IconTile icon={SquaresFour} size="sm" tone="blue" />
               <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
                 Categories
               </p>
             </div>
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-2 flex flex-col gap-1">
               <button
                 aria-pressed={activeCategory === "all"}
                 className={categoryButtonClasses(activeCategory === "all")}
@@ -323,17 +348,16 @@ export function ChecklistDashboard({
           </div>
         </aside>
 
-        <div className="min-w-0 space-y-4">
-          <div className="no-print sticky top-2 z-40 isolate max-w-full rounded-[1.25rem] border border-white/70 bg-paper/95 p-2.5 shadow-card backdrop-blur-md sm:top-3 sm:p-3 lg:rounded-[1.5rem]">
-            <div className="flex items-center gap-2.5">
-              <div className="min-w-0 flex-1">
+        <div className="min-w-0 space-y-3">
+          <div className="no-print sticky top-2 z-40 isolate max-w-full rounded-xl border border-black/10 bg-paper/95 px-2.5 py-2 shadow-tile backdrop-blur-md sm:top-3 sm:px-3">
+            <div className="min-w-0">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-sm font-black text-slate-600">
+                  <p className="truncate text-xs font-bold text-slate-600 sm:text-sm">
                     {completedCount} of {items.length} completed
                   </p>
                   <p
                     className={[
-                      "shrink-0 text-sm font-black text-pine",
+                      "shrink-0 text-xs font-black text-pine sm:text-sm",
                       reducedMotion ? "" : "progress-number-change"
                     ].join(" ")}
                     key={progress}
@@ -349,7 +373,7 @@ export function ChecklistDashboard({
                 <p
                   aria-live="polite"
                   className={[
-                    "mt-1 text-[10px] font-semibold leading-3 sm:text-[11px] sm:leading-4",
+                    "mt-0.5 text-[10px] font-semibold leading-3 sm:text-[11px] sm:leading-4",
                     milestone ? "text-pine" : "text-slate-500",
                     milestone && !reducedMotion ? "milestone-message" : ""
                   ].join(" ")}
@@ -360,17 +384,6 @@ export function ChecklistDashboard({
                       : `${milestone}% milestone reached.`
                     : "Progress saves automatically on this device."}
                 </p>
-              </div>
-
-              <button
-                aria-label="Share this checklist"
-                className="inline-flex min-h-9 shrink-0 items-center justify-center gap-2 rounded-full bg-ink px-2.5 text-sm font-black text-white shadow-tile transition hover:bg-pine sm:min-h-10 sm:px-3"
-                onClick={shareChecklist}
-                type="button"
-              >
-                <IconTile className="shadow-none" icon={ShareFat} size="sm" tone="cream" />
-                <span className="hidden sm:inline">Share</span>
-              </button>
             </div>
 
             <FilterBar setTimingFilter={setTimingFilter} timingFilter={timingFilter} />
@@ -398,6 +411,7 @@ export function ChecklistDashboard({
                   onCollapseComplete={finishCollapse}
                   onReorder={reorderVisibleItems}
                   onToggle={toggleItem}
+                  reorderMode={reorderMode}
                   reducedMotion={reducedMotion}
                 />
               ))}
@@ -474,7 +488,7 @@ function ChecklistFeedback({ formUrl }: { formUrl: string }) {
 
 function categoryButtonClasses(active: boolean) {
   return [
-    "flex min-w-0 items-center justify-between gap-3 rounded-full px-3 py-2.5 text-left text-sm font-black transition",
+    "flex min-w-0 items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left text-sm font-bold transition",
     active
       ? "bg-ink text-white shadow-tile"
       : "bg-linen/70 text-slate-600 hover:bg-white hover:text-ink"
