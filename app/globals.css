@@ -110,13 +110,10 @@ input {
 .completion-collapsing {
   overflow: hidden;
   max-height: 3rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
   opacity: 0.62;
   transition:
-    max-height 200ms ease,
-    padding 200ms ease,
-    opacity 200ms ease;
+    max-height 150ms ease,
+    opacity 150ms ease;
 }
 
 .checkmark-reveal {
@@ -129,11 +126,17 @@ input {
 }
 
 .progress-milestone {
-  animation: progress-milestone 700ms ease-out;
+  animation: none;
 }
 
 .milestone-message {
-  animation: milestone-message 220ms ease-out;
+  animation: milestone-message 150ms ease-out;
+}
+
+.tokyo-checklist-page,
+.tokyo-minimal-header {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

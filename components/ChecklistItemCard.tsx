@@ -59,11 +59,17 @@ export function ChecklistItemCard({
     if (completed) setExpanded(false);
   }, [completed]);
 
+  useEffect(() => {
+    if (!collapsing) return;
+    const timer = window.setTimeout(() => onCollapseComplete(item.id), 180);
+    return () => window.clearTimeout(timer);
+  }, [collapsing, item.id, onCollapseComplete]);
+
   if (compactCompleted) {
     return (
       <article
         className={[
-          "print-card rounded-lg border border-black/5 bg-paper opacity-60",
+          "print-card border-b border-neutral-200 bg-white opacity-55 last:border-b-0",
           isDragging ? "opacity-0 !transition-none" : ""
         ].join(" ")}
         ref={setNodeRef}
@@ -71,14 +77,14 @@ export function ChecklistItemCard({
       >
         <button
           aria-label={`Mark ${item.title} incomplete`}
-          className="flex min-h-11 w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left transition hover:bg-greenSoft/50 active:bg-greenSoft"
+          className="flex min-h-12 w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-neutral-50 sm:px-4"
           onClick={() => onToggle(item.id)}
           type="button"
         >
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-pine text-white">
-            <Check aria-hidden="true" size={14} weight="bold" />
+          <span className="flex size-[18px] shrink-0 items-center justify-center bg-neutral-900 text-white">
+            <Check aria-hidden="true" size={12} weight="bold" />
           </span>
-          <span className="min-w-0 flex-1 text-sm font-bold leading-[1.2] text-slate-500 line-through decoration-slate-400">
+          <span className="min-w-0 flex-1 text-[15px] font-medium leading-5 text-neutral-500 line-through decoration-neutral-400">
             {item.title}
           </span>
         </button>
@@ -89,10 +95,10 @@ export function ChecklistItemCard({
   return (
     <article
       className={[
-        "print-card min-w-0 cursor-pointer rounded-lg border border-black/5 bg-paper p-2",
-        expanded && !collapsing ? "max-h-[30rem]" : "max-h-28",
-        reducedMotion ? "" : "transition-[opacity,box-shadow,background-color] duration-200 ease-out",
-        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:border-black/10 hover:bg-white",
+        "print-card min-w-0 cursor-pointer border-b border-neutral-200 bg-white last:border-b-0",
+        expanded && !collapsing ? "max-h-[32rem]" : "max-h-32",
+        reducedMotion ? "" : "transition-[opacity,background-color,max-height] duration-150 ease-out",
+        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:bg-neutral-50",
         isDragging ? "opacity-0 !transition-none" : ""
       ].join(" ")}
       onTransitionEnd={(event) => {
@@ -108,16 +114,16 @@ export function ChecklistItemCard({
       ref={setNodeRef}
       style={sortableStyle}
     >
-      <div className="flex gap-2">
-        <div className="relative size-6 shrink-0">
+      <div className="flex gap-3 px-3 py-2 sm:px-4">
+        <div className="relative mt-0.5 size-[18px] shrink-0">
           <button
             aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
             className={[
-              "check-control no-print absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-lg",
+              "check-control no-print absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center",
               reducedMotion ? "" : "transition-colors duration-150",
               completed
                 ? "is-checked text-white"
-                : "text-transparent focus-visible:text-pine"
+                : "text-transparent focus-visible:text-neutral-900"
             ].join(" ")}
             onClick={(event) => {
               event.stopPropagation();
@@ -127,14 +133,14 @@ export function ChecklistItemCard({
           >
             <span
               className={[
-                "flex size-6 items-center justify-center rounded-md border-2 transition-colors duration-150",
+                "flex size-[18px] items-center justify-center border transition-colors duration-150",
                 completed
-                  ? "border-pine bg-pine shadow-tile"
-                  : "border-black/10 bg-linen/80 group-hover:border-pine/35",
+                  ? "border-neutral-900 bg-neutral-900"
+                  : "border-neutral-500 bg-white group-hover:border-neutral-900",
                 completed ? "checkmark-reveal" : ""
               ].join(" ")}
             >
-              <Check aria-hidden="true" size={completed ? 14 : 11} weight="bold" />
+              <Check aria-hidden="true" size={11} weight="bold" />
             </span>
           </button>
         </div>
@@ -143,8 +149,8 @@ export function ChecklistItemCard({
           <div className="flex items-start gap-2">
             <h3
               className={[
-                "min-w-0 flex-1 text-[15px] font-black leading-[1.25] tracking-normal text-ink sm:text-base",
-                completed ? "text-slate-500 line-through decoration-slate-400 decoration-2" : ""
+                "min-w-0 flex-1 text-[15px] font-semibold leading-5 tracking-[-0.01em] text-neutral-900 sm:text-base",
+                completed ? "text-neutral-500 line-through decoration-neutral-400" : ""
               ].join(" ")}
             >
               {item.title}
@@ -155,7 +161,7 @@ export function ChecklistItemCard({
                 {...attributes}
                 {...listeners}
                 aria-label={`Reorder ${item.title}`}
-                className="no-print -m-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center rounded-lg text-slate-500 transition hover:bg-blueSoft hover:text-blueInk active:cursor-grabbing active:scale-95"
+                className="no-print -m-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center text-neutral-500 transition-colors hover:text-neutral-900 active:cursor-grabbing"
                 onClick={(event) => event.stopPropagation()}
                 ref={setActivatorNodeRef}
                 type="button"
@@ -167,7 +173,7 @@ export function ChecklistItemCard({
             <button
               aria-expanded={expanded}
               aria-label={expanded ? `Hide details for ${item.title}` : `Show details for ${item.title}`}
-              className="no-print -m-2 ml-0 inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-greenSoft hover:text-pine active:scale-95"
+              className="no-print -m-2 ml-0 inline-flex size-11 shrink-0 items-center justify-center text-neutral-500 transition-colors hover:text-neutral-900"
               onClick={(event) => {
                 event.stopPropagation();
                 toggleExpanded();
@@ -185,22 +191,22 @@ export function ChecklistItemCard({
           <div className="mt-1 flex flex-wrap gap-1">
             <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
             <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
+          </div>
+
+          <div className={expanded ? "mt-2.5 block pb-1" : "hidden print:block"}>
+            <p className="text-[13px] leading-5 text-neutral-600">{item.description}</p>
             {item.link ? (
               <a
-                className="no-print inline-flex min-h-6 max-w-full items-center gap-1 rounded-full bg-ink px-2 text-[10px] font-black text-white transition hover:bg-soot"
+                className="no-print mt-2 inline-flex min-h-8 max-w-full items-center gap-1.5 border-b border-neutral-400 text-xs font-semibold text-neutral-800 transition-colors hover:border-neutral-900"
                 href={item.link.url}
                 onClick={(event) => event.stopPropagation()}
                 rel="noreferrer"
                 target="_blank"
               >
-                <ArrowSquareOut aria-hidden="true" className="shrink-0" size={11} weight="bold" />
                 <span className="truncate">{item.link.label}</span>
+                <ArrowSquareOut aria-hidden="true" className="shrink-0" size={12} weight="bold" />
               </a>
             ) : null}
-          </div>
-
-          <div className={expanded ? "mt-2 block" : "hidden print:block"}>
-            <p className="text-sm leading-5 text-slate-600">{item.description}</p>
           </div>
         </div>
       </div>
@@ -210,12 +216,12 @@ export function ChecklistItemCard({
 
 export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
   return (
-    <div className="pointer-events-none flex h-[4.75rem] w-72 max-w-[calc(100vw-2rem)] items-start gap-2.5 overflow-hidden rounded-[1.25rem] border border-pine/10 bg-paper px-3 py-2.5 shadow-soft">
-      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-2xl border-2 border-black/10 bg-linen/80 text-transparent">
-        <Check aria-hidden="true" size={14} weight="bold" />
+    <div className="pointer-events-none flex min-h-16 w-72 max-w-[calc(100vw-2rem)] items-start gap-3 overflow-hidden border border-neutral-300 bg-white px-3 py-2 shadow-lg">
+      <span className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center border border-neutral-500 text-transparent">
+        <Check aria-hidden="true" size={11} weight="bold" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="max-h-10 overflow-hidden text-[0.95rem] font-black leading-5 text-ink">
+        <p className="max-h-10 overflow-hidden text-[15px] font-semibold leading-5 text-neutral-900">
           {item.title}
         </p>
         <div className="mt-1 flex gap-1.5">
@@ -223,8 +229,8 @@ export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
           <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
         </div>
       </div>
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-2xl bg-blueSoft text-blueInk">
-        <DotsSixVertical aria-hidden="true" size={18} weight="bold" />
+      <span className="flex size-8 shrink-0 items-center justify-center text-neutral-600">
+        <DotsSixVertical aria-hidden="true" size={16} weight="bold" />
       </span>
     </div>
   );

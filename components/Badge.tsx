@@ -3,12 +3,12 @@ import type { ChecklistPriority, ChecklistTiming } from "@/types/checklist";
 type BadgeTone = "required" | "recommended" | "optional" | "before-flight" | "at-airport" | "after-arrival";
 
 const toneClasses: Record<BadgeTone, string> = {
-  required: "bg-roseSoft text-roseInk",
-  recommended: "bg-greenSoft text-pine",
-  optional: "bg-orangeSoft text-clay",
-  "before-flight": "bg-blueSoft text-blueInk",
-  "at-airport": "bg-[#eee8db] text-soot",
-  "after-arrival": "bg-[#e1f3f1] text-[#0f766e]"
+  required: "border-neutral-400 text-neutral-700",
+  recommended: "border-neutral-300 text-neutral-600",
+  optional: "border-neutral-200 text-neutral-500",
+  "before-flight": "border-neutral-300 text-neutral-600",
+  "at-airport": "border-neutral-300 text-neutral-600",
+  "after-arrival": "border-neutral-300 text-neutral-600"
 };
 
 export const priorityLabels: Record<ChecklistPriority, string> = {
@@ -31,7 +31,7 @@ export function Badge({
   children: React.ReactNode;
 }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black leading-4 ${toneClasses[tone]}`}>
+    <span className={`inline-flex items-center rounded-sm border px-1.5 py-px text-[10px] font-semibold leading-4 ${toneClasses[tone]}`}>
       {children}
     </span>
   );

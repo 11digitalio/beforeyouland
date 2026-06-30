@@ -17,11 +17,9 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
-import { CaretDown, CaretUp, Check } from "@phosphor-icons/react/dist/ssr";
+import { CaretDown, CaretUp } from "@phosphor-icons/react/dist/ssr";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChecklistDragPreview, ChecklistItemCard } from "@/components/ChecklistItemCard";
-import { IconTile } from "@/components/IconTile";
-import { getCategoryVisual } from "@/components/categoryIcons";
 import type { ChecklistCategoryDefinition, ChecklistItem } from "@/types/checklist";
 
 export function ChecklistSection({
@@ -48,7 +46,7 @@ export function ChecklistSection({
   reorderMode: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [showCompletedSection, setShowCompletedSection] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const listRef = useRef<HTMLDivElement>(null);
   const completedCount = items.filter((item) => completedIds.has(item.id)).length;
   const sortedItems = [...items].sort(
@@ -57,7 +55,6 @@ export function ChecklistSection({
       Number(completedIds.has(b.id) && !collapsingIds.has(b.id))
   );
   const activeItem = activeId ? items.find((item) => item.id === activeId) : undefined;
-  const visual = getCategoryVisual(category.title);
   const sectionCollapseReady =
     allItemsComplete && !items.some((item) => collapsingIds.has(item.id));
   const sensors = useSensors(
@@ -101,103 +98,81 @@ export function ChecklistSection({
   }
 
   useEffect(() => {
-    if (!allItemsComplete) setShowCompletedSection(false);
-  }, [allItemsComplete]);
-
-  if (sectionCollapseReady) {
-    return (
-      <section aria-labelledby={category.id}>
-        <button
-          aria-expanded={showCompletedSection}
-          className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-black/5 bg-paper px-2.5 py-1.5 text-left transition-colors hover:bg-white"
-          onClick={() => setShowCompletedSection((current) => !current)}
-          type="button"
-        >
-          <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
-          <span className="min-w-0 flex-1 truncate text-sm font-black text-ink" id={category.id}>
-            {category.title}
-          </span>
-          <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-pine">
-            <Check aria-hidden="true" size={14} weight="bold" />
-            Complete
-          </span>
-          {showCompletedSection ? (
-            <CaretUp aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
-          ) : (
-            <CaretDown aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
-          )}
-        </button>
-        {showCompletedSection ? (
-          <div className="mt-2 grid min-w-0 gap-2 overflow-x-clip">
-            {sortedItems.map((item) => (
-              <ChecklistItemCard
-                collapsing={false}
-                completed
-                draggingActive={false}
-                item={item}
-                key={item.id}
-                onCollapseComplete={onCollapseComplete}
-                onToggle={onToggle}
-                reorderMode={false}
-                reducedMotion={reducedMotion}
-              />
-            ))}
-          </div>
-        ) : null}
-      </section>
-    );
-  }
+    if (sectionCollapseReady) setExpanded(false);
+    if (!allItemsComplete) setExpanded(true);
+  }, [allItemsComplete, sectionCollapseReady]);
 
   return (
-    <section aria-labelledby={category.id}>
-      <div className="mb-2 flex items-start gap-2">
-          <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
-          <div className="min-w-0">
-            <h2 className="text-[17px] font-black leading-5 tracking-normal text-ink sm:text-lg sm:leading-6" id={category.id}>
-              {category.title} <span className="text-sm font-bold text-slate-500">· {completedCount}/{items.length}</span>
-            </h2>
-            <p className="mt-0.5 hidden max-w-2xl text-sm leading-5 text-slate-600 sm:block">{category.summary}</p>
-          </div>
-      </div>
-
-      <DndContext
-        collisionDetection={closestCenter}
-        id={`checklist-${category.id}`}
-        modifiers={[restrictToVerticalList]}
-        onDragCancel={() => setActiveId(null)}
-        onDragEnd={handleDragEnd}
-        onDragStart={handleDragStart}
-        sensors={sensors}
+    <section aria-labelledby={category.id} className="border-t border-neutral-300">
+      <button
+        aria-expanded={expanded}
+        className="flex min-h-[4.5rem] w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-neutral-50 sm:px-4"
+        onClick={() => setExpanded((current) => !current)}
+        type="button"
       >
-        <SortableContext
-          items={sortedItems.map((item) => item.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          <div className="grid min-w-0 gap-2 overflow-x-clip" ref={listRef}>
-            {sortedItems.map((item) => (
-              <ChecklistItemCard
-                collapsing={collapsingIds.has(item.id)}
-                completed={completedIds.has(item.id)}
-                draggingActive={activeId !== null}
-                item={item}
-                key={item.id}
-                onCollapseComplete={onCollapseComplete}
-                onToggle={onToggle}
-                reorderMode={reorderMode}
-                reducedMotion={reducedMotion}
-              />
-            ))}
-          </div>
-        </SortableContext>
-        <DragOverlay
-          adjustScale={false}
-          dropAnimation={null}
+        <span className="min-w-0 flex-1">
+          <span
+            className="block text-[18px] font-extrabold leading-6 tracking-[-0.02em] text-neutral-950 sm:text-xl"
+            id={category.id}
+          >
+            {category.title}
+          </span>
+          <span className="mt-0.5 block text-xs font-medium text-neutral-500">
+            {completedCount}/{items.length} completed
+          </span>
+        </span>
+        {allItemsComplete ? (
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.1em] text-neutral-600">
+            Complete
+          </span>
+        ) : null}
+        {expanded ? (
+          <CaretUp aria-hidden="true" className="shrink-0 text-neutral-500" size={16} weight="bold" />
+        ) : (
+          <CaretDown aria-hidden="true" className="shrink-0 text-neutral-500" size={16} weight="bold" />
+        )}
+      </button>
+
+      {expanded ? (
+        <DndContext
+          collisionDetection={closestCenter}
+          id={`checklist-${category.id}`}
           modifiers={[restrictToVerticalList]}
-          zIndex={60}
+          onDragCancel={() => setActiveId(null)}
+          onDragEnd={handleDragEnd}
+          onDragStart={handleDragStart}
+          sensors={sensors}
         >
-          {activeItem ? <ChecklistDragPreview item={activeItem} /> : null}
-        </DragOverlay>
-      </DndContext>
+          <SortableContext
+            items={sortedItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="min-w-0 border-t border-neutral-200 overflow-x-clip" ref={listRef}>
+              {sortedItems.map((item) => (
+                <ChecklistItemCard
+                  collapsing={collapsingIds.has(item.id)}
+                  completed={completedIds.has(item.id)}
+                  draggingActive={activeId !== null}
+                  item={item}
+                  key={item.id}
+                  onCollapseComplete={onCollapseComplete}
+                  onToggle={onToggle}
+                  reorderMode={reorderMode}
+                  reducedMotion={reducedMotion}
+                />
+              ))}
+            </div>
+          </SortableContext>
+          <DragOverlay
+            adjustScale={false}
+            dropAnimation={null}
+            modifiers={[restrictToVerticalList]}
+            zIndex={60}
+          >
+            {activeItem ? <ChecklistDragPreview item={activeItem} /> : null}
+          </DragOverlay>
+        </DndContext>
+      ) : null}
     </section>
   );
 }

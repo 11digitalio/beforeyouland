@@ -13,24 +13,25 @@ export const metadata: Metadata = {
 
 export default function TokyoChecklistPage() {
   return (
-    <Layout>
-      <section className="min-h-screen bg-[#F7F6F1] px-4 pb-16 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-clay">
-              Tokyo arrival dashboard
+    <Layout minimalHeader>
+      <section className="tokyo-checklist-page min-h-screen bg-[#f5f5f3] px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+              Tokyo · Arrival checklist
             </p>
-            <h1 className="mt-1.5 text-[34px] font-black leading-[1.02] tracking-normal text-ink sm:mt-2 sm:text-[36px] sm:leading-[1.06]">
+            <h1 className="mt-2 text-[30px] font-extrabold leading-[1.08] tracking-[-0.035em] text-neutral-950 sm:text-[34px]">
               Your Tokyo pre-landing checklist
             </h1>
-            <p className="mt-2.5 max-w-2xl text-sm font-normal leading-5 text-slate-600 sm:text-base sm:leading-6">
+            <p className="mt-2 max-w-2xl text-sm leading-5 text-neutral-600">
               Built for a U.S. passport holder visiting Tokyo as a first-time solo traveler for under
               90 days.
             </p>
-            <div className="mt-2.5 max-w-2xl border-l-2 border-clay/40 pl-3 text-sm leading-5 text-slate-500">
-              <span className="font-bold text-ink">Last updated: June 2026.</span>{" "}
-              Travel requirements can change. Verify official sources before booking or flying.
-            </div>
+            <p className="mt-2 text-[13px] leading-5 text-neutral-500">
+              <span className="font-semibold text-neutral-700">Updated June 2026</span>
+              <span aria-hidden="true"> · </span>
+              Verify official sources before booking or flying.
+            </p>
           </div>
 
           <ChecklistDashboard categories={tokyoChecklistCategories} items={tokyoChecklistItems} />
