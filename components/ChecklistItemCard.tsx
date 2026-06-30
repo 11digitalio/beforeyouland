@@ -89,7 +89,7 @@ export function ChecklistItemCard({
   return (
     <article
       className={[
-        "print-card min-w-0 cursor-pointer rounded-lg border border-black/5 bg-paper p-2.5",
+        "print-card min-w-0 cursor-pointer rounded-lg border border-black/5 bg-paper p-2",
         expanded && !collapsing ? "max-h-[30rem]" : "max-h-28",
         reducedMotion ? "" : "transition-[opacity,box-shadow,background-color] duration-200 ease-out",
         collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:border-black/10 hover:bg-white",
@@ -143,7 +143,7 @@ export function ChecklistItemCard({
           <div className="flex items-start gap-2">
             <h3
               className={[
-                "min-w-0 flex-1 text-base font-black leading-[1.2] tracking-normal text-ink",
+                "min-w-0 flex-1 text-[15px] font-black leading-[1.25] tracking-normal text-ink sm:text-base",
                 completed ? "text-slate-500 line-through decoration-slate-400 decoration-2" : ""
               ].join(" ")}
             >
@@ -182,7 +182,7 @@ export function ChecklistItemCard({
             </button>
           </div>
 
-          <div className="mt-1.5 flex flex-wrap gap-1">
+          <div className="mt-1 flex flex-wrap gap-1">
             <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
             <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
             {item.link ? (

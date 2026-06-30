@@ -20,7 +20,7 @@ export default function TokyoChecklistPage() {
             <p className="text-xs font-black uppercase tracking-[0.16em] text-clay">
               Tokyo arrival dashboard
             </p>
-            <h1 className="mt-1.5 text-[34px] font-black leading-[1.06] tracking-normal text-ink sm:mt-2 sm:text-4xl sm:leading-[1.08]">
+            <h1 className="mt-1.5 text-[34px] font-black leading-[1.02] tracking-normal text-ink sm:mt-2 sm:text-[36px] sm:leading-[1.06]">
               Your Tokyo pre-landing checklist
             </h1>
             <p className="mt-2.5 max-w-2xl text-sm font-normal leading-5 text-slate-600 sm:text-base sm:leading-6">

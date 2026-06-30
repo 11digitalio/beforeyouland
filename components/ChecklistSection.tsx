@@ -17,7 +17,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
-import { CaretDown, Check } from "@phosphor-icons/react/dist/ssr";
+import { CaretDown, CaretUp, Check } from "@phosphor-icons/react/dist/ssr";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChecklistDragPreview, ChecklistItemCard } from "@/components/ChecklistItemCard";
 import { IconTile } from "@/components/IconTile";
@@ -104,13 +104,13 @@ export function ChecklistSection({
     if (!allItemsComplete) setShowCompletedSection(false);
   }, [allItemsComplete]);
 
-  if (sectionCollapseReady && !showCompletedSection) {
+  if (sectionCollapseReady) {
     return (
       <section aria-labelledby={category.id}>
         <button
-          aria-expanded="false"
+          aria-expanded={showCompletedSection}
           className="flex min-h-11 w-full items-center gap-2 rounded-lg border border-black/5 bg-paper px-2.5 py-1.5 text-left transition-colors hover:bg-white"
-          onClick={() => setShowCompletedSection(true)}
+          onClick={() => setShowCompletedSection((current) => !current)}
           type="button"
         >
           <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
@@ -121,8 +121,29 @@ export function ChecklistSection({
             <Check aria-hidden="true" size={14} weight="bold" />
             Complete
           </span>
-          <CaretDown aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
+          {showCompletedSection ? (
+            <CaretUp aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
+          ) : (
+            <CaretDown aria-hidden="true" className="shrink-0 text-slate-500" size={15} weight="bold" />
+          )}
         </button>
+        {showCompletedSection ? (
+          <div className="mt-2 grid min-w-0 gap-2 overflow-x-clip">
+            {sortedItems.map((item) => (
+              <ChecklistItemCard
+                collapsing={false}
+                completed
+                draggingActive={false}
+                item={item}
+                key={item.id}
+                onCollapseComplete={onCollapseComplete}
+                onToggle={onToggle}
+                reorderMode={false}
+                reducedMotion={reducedMotion}
+              />
+            ))}
+          </div>
+        ) : null}
       </section>
     );
   }
@@ -132,7 +153,7 @@ export function ChecklistSection({
       <div className="mb-2 flex items-start gap-2">
           <IconTile className="shadow-none" icon={visual.icon} size="sm" tone={visual.tone} />
           <div className="min-w-0">
-            <h2 className="text-lg font-black leading-6 tracking-normal text-ink sm:text-xl" id={category.id}>
+            <h2 className="text-[17px] font-black leading-5 tracking-normal text-ink sm:text-lg sm:leading-6" id={category.id}>
               {category.title} <span className="text-sm font-bold text-slate-500">· {completedCount}/{items.length}</span>
             </h2>
             <p className="mt-0.5 hidden max-w-2xl text-sm leading-5 text-slate-600 sm:block">{category.summary}</p>
