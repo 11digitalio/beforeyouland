@@ -1,10 +1,12 @@
 "use client";
 
-import { ArrowCounterClockwise, CaretDown, ShareFat } from "@phosphor-icons/react/dist/ssr";
+import { ArrowCounterClockwise, CaretDown, ShareFat, SquaresFour } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChecklistSection } from "@/components/ChecklistSection";
 import { FilterBar } from "@/components/FilterBar";
+import { IconTile } from "@/components/IconTile";
 import { ProgressBar } from "@/components/ProgressBar";
+import { getCategoryVisual } from "@/components/categoryIcons";
 import { trackEvent } from "@/lib/analytics";
 import type {
   ChecklistCategoryDefinition,
@@ -237,12 +239,12 @@ export function ChecklistDashboard({
   }
 
   return (
-    <div className="mt-4 min-w-0 lg:mt-6">
-      <div className="no-print mb-3 flex min-w-0 items-center gap-2">
+    <div className="mt-3 min-w-0 lg:mt-6">
+      <div className="no-print mb-2.5 flex min-w-0 items-center gap-2 lg:mb-3">
         <div className="relative min-w-0 flex-1 lg:hidden">
           <select
             aria-label="Category"
-            className="min-h-11 w-full appearance-none rounded-lg border border-[#D1D1D6] bg-white py-2 pl-3 pr-9 text-[14px] font-medium leading-none text-[#1D1D1F] outline-none transition focus:border-[#007AFF]"
+            className="min-h-11 w-full appearance-none rounded-lg border border-black/10 bg-paper py-2 pl-3 pr-9 text-sm font-bold leading-none text-ink outline-none transition focus:border-pine/30 focus:bg-white"
             id="mobile-category-filter"
             onChange={(event) => setActiveCategory(event.target.value)}
             value={activeCategory}
@@ -259,18 +261,19 @@ export function ChecklistDashboard({
           </select>
           <CaretDown
             aria-hidden="true"
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93]"
-            size={13}
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500"
+            size={15}
+            weight="bold"
           />
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-1.5">
           <button
             aria-pressed={reorderMode}
             className={[
-              "inline-flex min-h-11 items-center justify-center rounded-lg px-3 text-[13px] font-medium transition",
+              "inline-flex min-h-11 items-center justify-center rounded-lg px-2.5 text-xs font-bold transition",
               reorderMode
-                ? "bg-[#007AFF] text-white"
-                : "border border-[#D1D1D6] bg-white text-[#3A3A3C] hover:bg-[#F2F2F7]"
+                ? "bg-blueSoft text-blueInk"
+                : "border border-black/10 bg-paper text-slate-600 hover:bg-linen"
             ].join(" ")}
             onClick={() => setReorderMode((current) => !current)}
             type="button"
@@ -279,7 +282,7 @@ export function ChecklistDashboard({
           </button>
           <button
             aria-label="Share this checklist"
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-[#D1D1D6] bg-white px-3 text-[13px] font-medium text-[#007AFF] transition hover:bg-[#F2F2F7]"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg bg-ink px-2.5 text-xs font-bold text-white transition hover:bg-pine"
             onClick={shareChecklist}
             type="button"
           >
@@ -289,24 +292,36 @@ export function ChecklistDashboard({
         </div>
       </div>
 
-      <div className="grid min-w-0 gap-4 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-5">
         <aside className="no-print hidden lg:sticky lg:top-5 lg:block lg:self-start">
-          <div>
-            <div className="px-3 py-1">
-              <p className="text-[13px] font-semibold text-[#6E6E73]">Categories</p>
+          <div className="rounded-xl border border-black/5 bg-paper p-2">
+            <div className="flex items-center gap-2 px-2 py-1">
+              <IconTile icon={SquaresFour} size="sm" tone="blue" />
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">
+                Categories
+              </p>
             </div>
-            <div className="mt-1 flex flex-col gap-0.5">
+            <div className="mt-2 flex flex-col gap-1">
               <button
                 aria-pressed={activeCategory === "all"}
                 className={categoryButtonClasses(activeCategory === "all")}
                 onClick={() => setActiveCategory("all")}
                 type="button"
               >
-                <span className="truncate">All sections</span>
+                <span className="flex min-w-0 items-center gap-2">
+                  <IconTile
+                    className="shadow-none"
+                    icon={SquaresFour}
+                    size="sm"
+                    tone={activeCategory === "all" ? "cream" : "blue"}
+                  />
+                  <span className="truncate">All sections</span>
+                </span>
                 <span>{items.length}</span>
               </button>
               {categories.map((category) => {
                 const count = items.filter((item) => item.category === category.title).length;
+                const visual = getCategoryVisual(category.title);
                 const active = activeCategory === category.title;
                 return (
                   <button
@@ -316,7 +331,15 @@ export function ChecklistDashboard({
                     onClick={() => setActiveCategory(category.title)}
                     type="button"
                   >
-                    <span className="truncate">{category.title}</span>
+                    <span className="flex min-w-0 items-center gap-2">
+                      <IconTile
+                        className="shadow-none"
+                        icon={visual.icon}
+                        size="sm"
+                        tone={active ? "cream" : visual.tone}
+                      />
+                      <span className="truncate">{category.title}</span>
+                    </span>
                     <span>{count}</span>
                   </button>
                 );
@@ -325,16 +348,16 @@ export function ChecklistDashboard({
           </div>
         </aside>
 
-        <div className="min-w-0 space-y-4">
-          <div className="no-print sticky top-2 z-40 isolate max-w-full rounded-[10px] border border-[#D1D1D6] bg-white/95 px-3 py-2 backdrop-blur-md sm:top-3">
+        <div className="min-w-0 space-y-3">
+          <div className="no-print sticky top-2 z-40 isolate max-w-full rounded-xl border border-black/10 bg-paper/95 px-2.5 py-2 shadow-tile backdrop-blur-md sm:top-3 sm:px-3">
             <div className="min-w-0">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="truncate text-[13px] font-medium text-[#6E6E73]">
+                  <p className="truncate text-xs font-bold text-slate-600 sm:text-sm">
                     {completedCount} of {items.length} completed
                   </p>
                   <p
                     className={[
-                      "shrink-0 text-[13px] font-semibold text-[#007AFF]",
+                      "shrink-0 text-xs font-black text-pine sm:text-sm",
                       reducedMotion ? "" : "progress-number-change"
                     ].join(" ")}
                     key={progress}
@@ -350,8 +373,8 @@ export function ChecklistDashboard({
                 <p
                   aria-live="polite"
                   className={[
-                    "mt-1 text-[11px] font-normal leading-3",
-                    milestone ? "text-[#007AFF]" : "text-[#8E8E93]",
+                    "mt-0.5 text-[10px] font-semibold leading-3 sm:text-[11px] sm:leading-4",
+                    milestone ? "text-pine" : "text-slate-500",
                     milestone && !reducedMotion ? "milestone-message" : ""
                   ].join(" ")}
                 >
@@ -368,7 +391,7 @@ export function ChecklistDashboard({
             {shareStatus ? <p className="mt-2 text-sm font-semibold text-pine">{shareStatus}</p> : null}
             {shareLink ? (
               <input
-                className="mt-2 w-full rounded-lg border border-[#D1D1D6] bg-white px-3 py-2 text-sm text-[#3A3A3C]"
+                className="mt-2 w-full rounded-full border border-black/5 bg-linen px-3 py-2 text-sm font-semibold text-slate-600"
                 onFocus={(event) => event.currentTarget.select()}
                 readOnly
                 value={shareLink}
@@ -377,7 +400,7 @@ export function ChecklistDashboard({
           </div>
 
           {sections.length > 0 ? (
-            <div className="print-grid space-y-7">
+            <div className="print-grid space-y-6">
               {sections.map((section) => (
                 <ChecklistSection
                   allItemsComplete={items
@@ -397,9 +420,9 @@ export function ChecklistDashboard({
               ))}
             </div>
           ) : (
-            <div className="rounded-xl border border-[#D1D1D6] bg-white p-8 text-center">
-              <h2 className="text-xl font-semibold text-[#1D1D1F]">No checklist items match.</h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-[#6E6E73]">
+            <div className="rounded-[1.75rem] border border-dashed border-slate-300 bg-paper p-10 text-center shadow-card">
+              <h2 className="text-2xl font-black tracking-normal text-ink">No checklist items match.</h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
                 Adjust the category or timing filters to bring tasks back into view.
               </p>
             </div>
@@ -409,7 +432,7 @@ export function ChecklistDashboard({
 
           <div className="no-print flex justify-end pt-1">
             <button
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-transparent px-3 text-[13px] font-medium text-[#6E6E73] transition hover:bg-white hover:text-[#B42318]"
+              className="inline-flex min-h-9 items-center gap-2 rounded-full bg-transparent px-3 text-xs font-black text-slate-500 transition hover:bg-roseSoft hover:text-roseInk"
               onClick={resetChecklist}
               type="button"
             >
@@ -468,10 +491,10 @@ function ChecklistFeedback({ formUrl }: { formUrl: string }) {
 
 function categoryButtonClasses(active: boolean) {
   return [
-    "flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-lg px-3 py-2 text-left text-[14px] font-medium transition",
+    "flex min-w-0 items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-left text-sm font-bold transition",
     active
-      ? "bg-white text-[#007AFF]"
-      : "text-[#6E6E73] hover:bg-white hover:text-[#1D1D1F]"
+      ? "bg-ink text-white shadow-tile"
+      : "bg-linen/70 text-slate-600 hover:bg-white hover:text-ink"
   ].join(" ");
 }
 
