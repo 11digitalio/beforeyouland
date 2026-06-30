@@ -38,9 +38,9 @@ export function FilterBar({
 
 function chipClasses(active: boolean) {
   return [
-    "min-h-9 shrink-0 whitespace-nowrap rounded px-2.5 text-[11px] font-semibold transition-colors sm:text-xs",
+    "min-h-9 shrink-0 whitespace-nowrap border px-2.5 text-[10px] font-bold uppercase tracking-[0.04em] transition-colors",
     active
-      ? "bg-neutral-900 text-white"
-      : "border border-neutral-300 bg-white text-neutral-600 hover:border-neutral-500 hover:text-neutral-900"
+      ? "border-[#f05a28] bg-transparent text-[#f05a28]"
+      : "border-black/20 bg-transparent text-[#77736c] hover:border-[#2b2b2b] hover:text-[#2b2b2b]"
   ].join(" ");
 }

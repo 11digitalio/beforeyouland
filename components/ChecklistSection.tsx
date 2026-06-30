@@ -17,7 +17,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
-import { CaretDown, CaretUp } from "@phosphor-icons/react/dist/ssr";
+import { CaretDown, CaretUp, Check } from "@phosphor-icons/react/dist/ssr";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChecklistDragPreview, ChecklistItemCard } from "@/components/ChecklistItemCard";
 import type { ChecklistCategoryDefinition, ChecklistItem } from "@/types/checklist";
@@ -28,6 +28,7 @@ export function ChecklistSection({
   allItemsComplete,
   completedIds,
   collapsingIds,
+  defaultExpanded,
   reducedMotion,
   onCollapseComplete,
   onReorder,
@@ -39,6 +40,7 @@ export function ChecklistSection({
   allItemsComplete: boolean;
   completedIds: Set<string>;
   collapsingIds: Set<string>;
+  defaultExpanded: boolean;
   reducedMotion: boolean;
   onCollapseComplete: (id: string) => void;
   onReorder: (category: string, visibleIncompleteIds: string[]) => void;
@@ -46,8 +48,9 @@ export function ChecklistSection({
   reorderMode: boolean;
 }) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(defaultExpanded);
   const listRef = useRef<HTMLDivElement>(null);
+  const previousAllItemsCompleteRef = useRef(allItemsComplete);
   const completedCount = items.filter((item) => completedIds.has(item.id)).length;
   const sortedItems = [...items].sort(
     (a, b) =>
@@ -99,37 +102,39 @@ export function ChecklistSection({
 
   useEffect(() => {
     if (sectionCollapseReady) setExpanded(false);
-    if (!allItemsComplete) setExpanded(true);
+    if (previousAllItemsCompleteRef.current && !allItemsComplete) setExpanded(true);
+    previousAllItemsCompleteRef.current = allItemsComplete;
   }, [allItemsComplete, sectionCollapseReady]);
 
   return (
-    <section aria-labelledby={category.id} className="border-t border-neutral-300">
+    <section aria-labelledby={category.id} className="border-t border-black/[0.22]">
       <button
         aria-expanded={expanded}
-        className="flex min-h-[4.5rem] w-full items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-neutral-50 sm:px-4"
+        className="group flex min-h-[5.5rem] w-full items-center gap-3 py-4 text-left transition-colors hover:text-[#f05a28] sm:min-h-24 sm:py-5"
         onClick={() => setExpanded((current) => !current)}
         type="button"
       >
         <span className="min-w-0 flex-1">
           <span
-            className="block text-[18px] font-extrabold leading-6 tracking-[-0.02em] text-neutral-950 sm:text-xl"
+            className="tokyo-condensed-title block text-[29px] uppercase leading-[0.95] text-[#2b2b2b] transition-colors group-hover:text-[#f05a28] min-[380px]:text-[32px] sm:text-[38px]"
             id={category.id}
           >
             {category.title}
           </span>
-          <span className="mt-0.5 block text-xs font-medium text-neutral-500">
-            {completedCount}/{items.length} completed
+          <span className="mt-1.5 block text-[10px] font-bold uppercase tracking-[0.1em] text-[#77736c]">
+            {completedCount}/{items.length} complete
           </span>
         </span>
         {allItemsComplete ? (
-          <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.1em] text-neutral-600">
+          <span className="inline-flex shrink-0 items-center gap-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#f05a28]">
+            <Check aria-hidden="true" size={11} weight="bold" />
             Complete
           </span>
         ) : null}
         {expanded ? (
-          <CaretUp aria-hidden="true" className="shrink-0 text-neutral-500" size={16} weight="bold" />
+          <CaretUp aria-hidden="true" className="shrink-0 text-[#77736c]" size={15} weight="bold" />
         ) : (
-          <CaretDown aria-hidden="true" className="shrink-0 text-neutral-500" size={16} weight="bold" />
+          <CaretDown aria-hidden="true" className="shrink-0 text-[#77736c]" size={15} weight="bold" />
         )}
       </button>
 
@@ -147,7 +152,7 @@ export function ChecklistSection({
             items={sortedItems.map((item) => item.id)}
             strategy={verticalListSortingStrategy}
           >
-            <div className="min-w-0 border-t border-neutral-200 overflow-x-clip" ref={listRef}>
+            <div className="min-w-0 overflow-x-clip border-t border-black/[0.22]" ref={listRef}>
               {sortedItems.map((item) => (
                 <ChecklistItemCard
                   collapsing={collapsingIds.has(item.id)}

@@ -108,12 +108,8 @@ input {
 }
 
 .completion-collapsing {
-  overflow: hidden;
-  max-height: 3rem;
-  opacity: 0.62;
-  transition:
-    max-height 150ms ease,
-    opacity 150ms ease;
+  opacity: 0.72;
+  transition: opacity 120ms ease;
 }
 
 .checkmark-reveal {
@@ -136,7 +132,66 @@ input {
 .tokyo-checklist-page,
 .tokyo-minimal-header {
   font-family:
-    -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
+    "Helvetica Neue", Helvetica, Arial, ui-sans-serif, sans-serif;
+}
+
+.tokyo-checklist-page {
+  color: #2b2b2b;
+}
+
+.tokyo-condensed-title {
+  font-family:
+    Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Narrow", "Helvetica Neue Condensed Bold",
+    sans-serif;
+  font-stretch: condensed;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+}
+
+.tokyo-checklist-page :focus-visible,
+.tokyo-minimal-header :focus-visible {
+  outline-color: rgba(240, 90, 40, 0.52);
+}
+
+.tokyo-secondary-content > section {
+  border-top: 1px solid rgba(43, 43, 43, 0.22);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1.25rem 0;
+}
+
+.tokyo-secondary-content > section > div > span {
+  display: none;
+}
+
+.tokyo-secondary-content h2 {
+  color: #2b2b2b;
+  font-family:
+    Impact, Haettenschweiler, "Arial Narrow Bold", "Arial Narrow", "Helvetica Neue Condensed Bold",
+    sans-serif;
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+}
+
+.tokyo-secondary-content input,
+.tokyo-secondary-content button {
+  border: 1px solid rgba(43, 43, 43, 0.25);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.tokyo-secondary-content button {
+  border-color: #2b2b2b;
+  color: #2b2b2b;
+}
+
+.tokyo-secondary-content button:hover {
+  border-color: #f05a28;
+  background: transparent;
+  color: #f05a28;
 }
 
 @media (prefers-reduced-motion: reduce) {

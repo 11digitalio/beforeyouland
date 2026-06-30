@@ -237,12 +237,12 @@ export function ChecklistDashboard({
   }
 
   return (
-    <div className="mt-5 min-w-0">
-      <div className="no-print flex min-w-0 flex-wrap items-center gap-2">
+    <div className="mt-4 min-w-0">
+      <div className="no-print flex min-w-0 flex-wrap items-center gap-1.5 border-t border-black/[0.22] pt-3">
         <div className="relative min-w-[10rem] flex-1">
           <select
             aria-label="Category"
-            className="min-h-11 w-full appearance-none rounded border border-neutral-300 bg-white py-2 pl-3 pr-9 text-sm font-semibold text-neutral-800 outline-none transition-colors focus:border-neutral-700"
+            className="min-h-11 w-full appearance-none border border-black/25 bg-transparent py-2 pl-3 pr-9 text-[12px] font-bold uppercase tracking-[0.04em] text-[#2b2b2b] outline-none transition-colors focus:border-[#2b2b2b]"
             id="mobile-category-filter"
             onChange={(event) => setActiveCategory(event.target.value)}
             value={activeCategory}
@@ -259,7 +259,7 @@ export function ChecklistDashboard({
           </select>
           <CaretDown
             aria-hidden="true"
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#77736c]"
             size={14}
             weight="bold"
           />
@@ -267,10 +267,10 @@ export function ChecklistDashboard({
         <button
           aria-pressed={reorderMode}
           className={[
-            "inline-flex min-h-11 items-center justify-center rounded border px-3 text-xs font-semibold transition-colors",
+            "inline-flex min-h-11 items-center justify-center border px-3 text-[11px] font-bold uppercase tracking-[0.05em] transition-colors",
             reorderMode
-              ? "border-neutral-900 bg-neutral-900 text-white"
-              : "border-neutral-300 bg-white text-neutral-600 hover:border-neutral-500"
+              ? "border-[#f05a28] bg-transparent text-[#f05a28]"
+              : "border-black/25 bg-transparent text-[#77736c] hover:border-[#2b2b2b] hover:text-[#2b2b2b]"
           ].join(" ")}
           onClick={() => setReorderMode((current) => !current)}
           type="button"
@@ -279,7 +279,7 @@ export function ChecklistDashboard({
         </button>
         <button
           aria-label="Share this checklist"
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded border border-neutral-300 bg-white px-3 text-xs font-semibold text-neutral-700 transition-colors hover:border-neutral-500"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 border border-black/25 bg-transparent px-3 text-[11px] font-bold uppercase tracking-[0.05em] text-[#77736c] transition-colors hover:border-[#2b2b2b] hover:text-[#2b2b2b]"
           onClick={shareChecklist}
           type="button"
         >
@@ -288,14 +288,14 @@ export function ChecklistDashboard({
         </button>
       </div>
 
-      <div className="no-print sticky top-2 z-40 mt-2 border border-neutral-200 bg-white/95 px-3 py-2.5 backdrop-blur-sm">
+      <div className="no-print sticky top-0 z-40 mt-2 border-y border-black/[0.22] bg-[#edebe6]/95 py-2 backdrop-blur-sm">
         <div className="flex items-center justify-between gap-3">
-          <p className="truncate text-xs font-semibold text-neutral-600 sm:text-sm">
+          <p className="truncate text-[11px] font-bold uppercase tracking-[0.06em] text-[#77736c]">
             {completedCount} of {items.length} completed
           </p>
           <p
             className={[
-              "shrink-0 text-xs font-bold text-neutral-900 sm:text-sm",
+              "shrink-0 text-[11px] font-bold text-[#2b2b2b]",
               reducedMotion ? "" : "progress-number-change"
             ].join(" ")}
             key={progress}
@@ -311,7 +311,7 @@ export function ChecklistDashboard({
         <p
           aria-live="polite"
           className={[
-            "mt-1 text-[10px] font-medium leading-3 text-neutral-500",
+            "mt-1 text-[10px] font-medium leading-3 text-[#77736c]",
             milestone && !reducedMotion ? "milestone-message" : ""
           ].join(" ")}
         >
@@ -322,10 +322,10 @@ export function ChecklistDashboard({
             : "Progress saves automatically on this device."}
         </p>
         <FilterBar setTimingFilter={setTimingFilter} timingFilter={timingFilter} />
-        {shareStatus ? <p className="mt-2 text-xs font-semibold text-neutral-700">{shareStatus}</p> : null}
+        {shareStatus ? <p className="mt-2 text-xs font-semibold text-[#f05a28]">{shareStatus}</p> : null}
         {shareLink ? (
           <input
-            className="mt-2 w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-600"
+            className="mt-2 w-full border border-black/25 bg-transparent px-3 py-2 text-sm text-[#77736c]"
             onFocus={(event) => event.currentTarget.select()}
             readOnly
             value={shareLink}
@@ -334,8 +334,8 @@ export function ChecklistDashboard({
       </div>
 
       {sections.length > 0 ? (
-        <div className="print-grid mt-5 border-b border-neutral-300 bg-white">
-          {sections.map((section) => (
+        <div className="print-grid mt-4 border-b border-black/[0.22]">
+          {sections.map((section, index) => (
             <ChecklistSection
               allItemsComplete={items
                 .filter((item) => item.category === section.category.title)
@@ -343,6 +343,7 @@ export function ChecklistDashboard({
               category={section.category}
               collapsingIds={collapsingIds}
               completedIds={completedIds}
+              defaultExpanded={index === 0}
               items={section.items}
               key={section.category.id}
               onCollapseComplete={finishCollapse}
@@ -354,9 +355,9 @@ export function ChecklistDashboard({
           ))}
         </div>
       ) : (
-        <div className="mt-5 border border-dashed border-neutral-300 bg-white p-8 text-center">
-          <h2 className="text-lg font-bold text-neutral-900">No checklist items match.</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-neutral-600">
+        <div className="mt-5 border-y border-dashed border-black/25 py-10 text-center">
+          <h2 className="tokyo-condensed-title text-2xl uppercase text-[#2b2b2b]">No checklist items match.</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-5 text-[#77736c]">
             Adjust the category or timing filters to bring tasks back into view.
           </p>
         </div>
@@ -366,7 +367,7 @@ export function ChecklistDashboard({
 
       <div className="no-print flex justify-end pt-3">
         <button
-          className="inline-flex min-h-11 items-center gap-2 px-2 text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900"
+          className="inline-flex min-h-11 items-center gap-2 px-1 text-[11px] font-bold uppercase tracking-[0.05em] text-[#77736c] transition-colors hover:text-[#2b2b2b]"
           onClick={resetChecklist}
           type="button"
         >

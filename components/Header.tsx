@@ -9,14 +9,14 @@ export function Header({ minimal = false }: { minimal?: boolean }) {
       className={[
         "no-print border-b",
         minimal
-          ? "tokyo-minimal-header border-black/10 bg-[#fafafa]"
+          ? "tokyo-minimal-header border-black/[0.22] bg-[#edebe6]"
           : "border-black/5 bg-linen/88 backdrop-blur"
       ].join(" ")}
     >
       <div
         className={[
           "mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8",
-          minimal ? "h-14" : "h-16"
+          minimal ? "h-12" : "h-16"
         ].join(" ")}
       >
         <Link

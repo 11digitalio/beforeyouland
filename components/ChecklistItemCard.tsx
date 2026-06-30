@@ -9,7 +9,7 @@ import {
   DotsSixVertical
 } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
-import { Badge, priorityLabels, timingLabels } from "@/components/Badge";
+import { priorityLabels, timingLabels } from "@/components/Badge";
 import type { ChecklistItem } from "@/types/checklist";
 
 export function ChecklistItemCard({
@@ -69,7 +69,7 @@ export function ChecklistItemCard({
     return (
       <article
         className={[
-          "print-card border-b border-neutral-200 bg-white opacity-55 last:border-b-0",
+          "print-card border-b border-black/[0.14] last:border-b-0",
           isDragging ? "opacity-0 !transition-none" : ""
         ].join(" ")}
         ref={setNodeRef}
@@ -77,14 +77,14 @@ export function ChecklistItemCard({
       >
         <button
           aria-label={`Mark ${item.title} incomplete`}
-          className="flex min-h-12 w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-neutral-50 sm:px-4"
+          className="flex min-h-11 w-full items-center gap-2.5 py-1.5 text-left"
           onClick={() => onToggle(item.id)}
           type="button"
         >
-          <span className="flex size-[18px] shrink-0 items-center justify-center bg-neutral-900 text-white">
-            <Check aria-hidden="true" size={12} weight="bold" />
+          <span className="flex size-4 shrink-0 items-center justify-center bg-[#f05a28] text-[#edebe6]">
+            <Check aria-hidden="true" size={10} weight="bold" />
           </span>
-          <span className="min-w-0 flex-1 text-[15px] font-medium leading-5 text-neutral-500 line-through decoration-neutral-400">
+          <span className="min-w-0 flex-1 text-[15px] font-medium leading-5 text-[#77736c] line-through decoration-[#f05a28] decoration-[1.5px]">
             {item.title}
           </span>
         </button>
@@ -95,35 +95,26 @@ export function ChecklistItemCard({
   return (
     <article
       className={[
-        "print-card min-w-0 cursor-pointer border-b border-neutral-200 bg-white last:border-b-0",
+        "print-card min-w-0 cursor-pointer border-b border-black/[0.14] last:border-b-0",
         expanded && !collapsing ? "max-h-[32rem]" : "max-h-32",
-        reducedMotion ? "" : "transition-[opacity,background-color,max-height] duration-150 ease-out",
-        collapsing ? "completion-collapsing" : draggingActive ? "" : "hover:bg-neutral-50",
+        reducedMotion ? "" : "transition-[opacity,color] duration-150 ease-out",
+        collapsing ? "completion-collapsing" : draggingActive ? "" : "",
         isDragging ? "opacity-0 !transition-none" : ""
       ].join(" ")}
-      onTransitionEnd={(event) => {
-        if (
-          collapsing &&
-          event.target === event.currentTarget &&
-          event.propertyName === "max-height"
-        ) {
-          onCollapseComplete(item.id);
-        }
-      }}
       onClick={toggleExpanded}
       ref={setNodeRef}
       style={sortableStyle}
     >
-      <div className="flex gap-3 px-3 py-2 sm:px-4">
-        <div className="relative mt-0.5 size-[18px] shrink-0">
+      <div className="flex min-h-11 gap-2.5 py-1.5">
+        <div className="relative mt-0.5 size-4 shrink-0">
           <button
             aria-label={completed ? `Mark ${item.title} incomplete` : `Mark ${item.title} complete`}
             className={[
               "check-control no-print absolute left-1/2 top-1/2 flex size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center",
               reducedMotion ? "" : "transition-colors duration-150",
               completed
-                ? "is-checked text-white"
-                : "text-transparent focus-visible:text-neutral-900"
+                ? "is-checked text-[#edebe6]"
+                : "text-transparent focus-visible:text-[#2b2b2b]"
             ].join(" ")}
             onClick={(event) => {
               event.stopPropagation();
@@ -133,14 +124,14 @@ export function ChecklistItemCard({
           >
             <span
               className={[
-                "flex size-[18px] items-center justify-center border transition-colors duration-150",
+                "flex size-4 items-center justify-center border transition-colors duration-150",
                 completed
-                  ? "border-neutral-900 bg-neutral-900"
-                  : "border-neutral-500 bg-white group-hover:border-neutral-900",
+                  ? "border-[#f05a28] bg-[#f05a28]"
+                  : "border-[#77736c] bg-transparent group-hover:border-[#2b2b2b]",
                 completed ? "checkmark-reveal" : ""
               ].join(" ")}
             >
-              <Check aria-hidden="true" size={11} weight="bold" />
+              <Check aria-hidden="true" size={10} weight="bold" />
             </span>
           </button>
         </div>
@@ -149,8 +140,10 @@ export function ChecklistItemCard({
           <div className="flex items-start gap-2">
             <h3
               className={[
-                "min-w-0 flex-1 text-[15px] font-semibold leading-5 tracking-[-0.01em] text-neutral-900 sm:text-base",
-                completed ? "text-neutral-500 line-through decoration-neutral-400" : ""
+                "min-w-0 flex-1 text-[15px] font-medium leading-5 tracking-[-0.01em] text-[#2b2b2b] sm:text-base",
+                completed
+                  ? "text-[#77736c] line-through decoration-[#f05a28] decoration-[1.5px]"
+                  : ""
               ].join(" ")}
             >
               {item.title}
@@ -161,7 +154,7 @@ export function ChecklistItemCard({
                 {...attributes}
                 {...listeners}
                 aria-label={`Reorder ${item.title}`}
-                className="no-print -m-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center text-neutral-500 transition-colors hover:text-neutral-900 active:cursor-grabbing"
+                className="no-print -m-2 inline-flex size-11 shrink-0 touch-manipulation cursor-grab items-center justify-center text-[#77736c] transition-colors hover:text-[#f05a28] active:cursor-grabbing"
                 onClick={(event) => event.stopPropagation()}
                 ref={setActivatorNodeRef}
                 type="button"
@@ -173,7 +166,7 @@ export function ChecklistItemCard({
             <button
               aria-expanded={expanded}
               aria-label={expanded ? `Hide details for ${item.title}` : `Show details for ${item.title}`}
-              className="no-print -m-2 ml-0 inline-flex size-11 shrink-0 items-center justify-center text-neutral-500 transition-colors hover:text-neutral-900"
+              className="no-print -m-2 ml-0 inline-flex size-11 shrink-0 items-center justify-center text-[#77736c] transition-colors hover:text-[#f05a28]"
               onClick={(event) => {
                 event.stopPropagation();
                 toggleExpanded();
@@ -188,16 +181,17 @@ export function ChecklistItemCard({
             </button>
           </div>
 
-          <div className="mt-1 flex flex-wrap gap-1">
-            <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
-            <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.07em] text-[#77736c]">
+            <span>{priorityLabels[item.priority]}</span>
+            <span aria-hidden="true" className="text-black/30">/</span>
+            <span>{timingLabels[item.timing]}</span>
           </div>
 
-          <div className={expanded ? "mt-2.5 block pb-1" : "hidden print:block"}>
-            <p className="text-[13px] leading-5 text-neutral-600">{item.description}</p>
+          <div className={expanded ? "mt-2 block pb-2 pr-3" : "hidden print:block"}>
+            <p className="max-w-2xl text-[13px] leading-[1.45] text-[#77736c]">{item.description}</p>
             {item.link ? (
               <a
-                className="no-print mt-2 inline-flex min-h-8 max-w-full items-center gap-1.5 border-b border-neutral-400 text-xs font-semibold text-neutral-800 transition-colors hover:border-neutral-900"
+                className="no-print mt-1.5 inline-flex min-h-8 max-w-full items-center gap-1 text-[12px] font-semibold text-[#2b2b2b] underline decoration-black/40 underline-offset-2 transition-colors hover:text-[#f05a28]"
                 href={item.link.url}
                 onClick={(event) => event.stopPropagation()}
                 rel="noreferrer"
@@ -216,20 +210,21 @@ export function ChecklistItemCard({
 
 export function ChecklistDragPreview({ item }: { item: ChecklistItem }) {
   return (
-    <div className="pointer-events-none flex min-h-16 w-72 max-w-[calc(100vw-2rem)] items-start gap-3 overflow-hidden border border-neutral-300 bg-white px-3 py-2 shadow-lg">
-      <span className="mt-0.5 flex size-[18px] shrink-0 items-center justify-center border border-neutral-500 text-transparent">
-        <Check aria-hidden="true" size={11} weight="bold" />
+    <div className="pointer-events-none flex min-h-14 w-72 max-w-[calc(100vw-2rem)] items-start gap-2.5 overflow-hidden border border-black/30 bg-[#edebe6] px-3 py-2">
+      <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center border border-[#77736c] text-transparent">
+        <Check aria-hidden="true" size={10} weight="bold" />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="max-h-10 overflow-hidden text-[15px] font-semibold leading-5 text-neutral-900">
+        <p className="max-h-10 overflow-hidden text-[15px] font-medium leading-5 text-[#2b2b2b]">
           {item.title}
         </p>
-        <div className="mt-1 flex gap-1.5">
-          <Badge tone={item.priority}>{priorityLabels[item.priority]}</Badge>
-          <Badge tone={item.timing}>{timingLabels[item.timing]}</Badge>
+        <div className="mt-0.5 flex gap-1.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#77736c]">
+          <span>{priorityLabels[item.priority]}</span>
+          <span aria-hidden="true">/</span>
+          <span>{timingLabels[item.timing]}</span>
         </div>
       </div>
-      <span className="flex size-8 shrink-0 items-center justify-center text-neutral-600">
+      <span className="flex size-8 shrink-0 items-center justify-center text-[#77736c]">
         <DotsSixVertical aria-hidden="true" size={16} weight="bold" />
       </span>
     </div>
